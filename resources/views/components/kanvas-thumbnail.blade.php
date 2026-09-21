@@ -57,20 +57,24 @@
     <div class="absolute inset-x-0 bottom-0 flex items-end gap-[0.45em] px-[0.6em] pb-[0.6em] pt-[1.7em]"
          style="background: linear-gradient(to top, rgba(2,6,23,0.88) 0%, rgba(2,6,23,0.62) 42%, rgba(2,6,23,0) 100%);">
         <div class="min-w-0 flex-1">
-            {{-- Palang aksen. Ini yang membuat pilihan warna terlihat pada
-                 semua model teks, bukan hanya pada Ceria yang kebetulan
-                 memakai aksen sebagai garis tepi hurufnya. --}}
-            <span
-                class="mb-[0.28em] block h-[0.085em] w-[1.5em] rounded-full [box-shadow:0_0.02em_0.04em_rgb(0_0_0/0.6)]"
-                style="background: {{ $aksen->heks() }};"
-            ></span>
+            {{-- Judul kosong tidak menyisakan apa pun: tidak ada teks contoh,
+                 tidak ada elemen kosong yang tetap memakan ruang, dan palang
+                 aksennya ikut hilang. Thumbnail tanpa judul memang dipakai
+                 untuk foto yang bicara sendiri — palang yang menggantung
+                 sendirian di situ akan tampak seperti sisa yang lupa dibuang. --}}
+            @if (trim($judul) !== '')
+                <span
+                    class="mb-[0.28em] block h-[0.085em] w-[1.5em] rounded-full [box-shadow:0_0.02em_0.04em_rgb(0_0_0/0.6)]"
+                    style="background: {{ $aksen->heks() }};"
+                ></span>
 
-            <h2 class="judul-kanvas judul-hias {{ $ukuran->klemJudul() }} text-[1.15em] leading-[1.06] tracking-[-0.015em]">
-                {{ $judul ?: 'Judul berita' }}
-            </h2>
+                <h2 class="judul-kanvas judul-hias {{ $ukuran->klemJudul() }} text-[1.15em] leading-[1.06] tracking-[-0.015em]">
+                    <span class="judul-isi">{{ $judul }}</span>
+                </h2>
+            @endif
 
             @if ($subjudul)
-                <p class="mt-[0.45em] {{ $ukuran->klemSubjudul() }} text-[0.3em] font-semibold leading-[1.4] text-white [text-shadow:0_0.06em_0.08em_rgb(0_0_0/0.8)]">
+                <p class="{{ trim($judul) !== '' ? 'mt-[0.45em]' : '' }} {{ $ukuran->klemSubjudul() }} text-[0.3em] font-semibold leading-[1.4] text-white [text-shadow:0_0.06em_0.08em_rgb(0_0_0/0.8)]">
                     {{ $subjudul }}
                 </p>
             @endif

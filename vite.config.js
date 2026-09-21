@@ -16,6 +16,8 @@ export default defineConfig({
                 bunny('Fredoka', { weights: [500, 600, 700] }),
                 bunny('Anton', { weights: [400] }),
                 bunny('Playfair Display', { weights: [700, 900] }),
+                bunny('Archivo Black', { weights: [400] }),
+                bunny('Bebas Neue', { weights: [400] }),
             ],
         }),
         tailwindcss(),

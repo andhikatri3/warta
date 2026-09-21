@@ -187,8 +187,14 @@
                             {{-- Contohnya diletakkan di atas bidang gelap, meniru
                                  keadaan sebenarnya: model teks ini memang dipakai
                                  menumpuk foto, bukan di atas kertas putih. --}}
-                            <span class="grid h-9 place-items-center rounded-md bg-slate-700">
-                                <span class="judul-kanvas judul-hias text-[20px] leading-none">{{ $m->contoh() }}</span>
+                            <span class="grid h-9 place-items-center overflow-hidden rounded-md bg-slate-700">
+                                {{-- Susunan span-nya harus sama persis dengan di kanvas,
+                                     termasuk .judul-isi: model Blok memasang latarnya di
+                                     situ, dan tanpa pembungkus itu contohnya menjanjikan
+                                     tampilan yang tidak akan pemakai dapatkan. --}}
+                                <span class="judul-kanvas judul-hias text-[20px] leading-none">
+                                    <span class="judul-isi">{{ $m->contoh() }}</span>
+                                </span>
                             </span>
                             <span class="mt-1.5 block text-[10px] font-bold leading-tight text-slate-600">{{ $m->label() }}</span>
                         </button>
@@ -201,14 +207,14 @@
 
             <div>
                 <span class="{{ $kelasLabel }}">Aksen</span>
-                <div class="flex gap-2">
+                <div class="flex flex-wrap gap-2">
                     @foreach (Aksen::cases() as $a)
                         <button
                             type="button"
                             wire:click="$set('aksen', '{{ $a->value }}')"
                             title="{{ $a->label() }}"
                             @class([
-                                'size-8 rounded-full transition',
+                                'size-7 rounded-full ring-1 ring-black/10 transition',
                                 'ring-2 ring-slate-900 ring-offset-2' => $this->aksenTerpilih === $a,
                                 'hover:scale-110' => $this->aksenTerpilih !== $a,
                             ])

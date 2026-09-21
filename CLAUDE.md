@@ -174,12 +174,28 @@ Garis tepi tebal itu yang membuat judul boleh ditumpuk di atas kolase sebagai
 satu-satunya tata letak. Tanpa hiasan ini, judul polos bisa mendarat tepat di
 atas wajah dan varian pita terpisah jadi perlu.
 
+Ada delapan model: Ceria, Tegas, Miring, Blok, Timbul, Pendar, Agung, Bersih.
+Model Blok memasang latar berwarna pada `.judul-isi`, pembungkus di dalam `h2`,
+bukan pada `h2`-nya. Itu bukan selera: latar yang menempel per baris butuh
+`display: inline`, sedangkan `line-clamp` bekerja lewat `display: -webkit-box` —
+memasangnya di elemen yang sama akan mematikan pemangkas barisnya.
+
+Susunan span di pemilih model harus sama persis dengan yang di kanvas,
+`.judul-isi` sekalipun. Kalau tidak, contohnya menjanjikan tampilan yang tidak
+akan pemakai dapatkan.
+
 **Aksen harus punya pekerjaan yang terlihat.** Ia pernah diam-diam jadi hiasan
 tanpa fungsi: waktu lencana label dibuang, satu-satunya sisa pemakainya adalah
-garis tepi huruf model Ceria, jadi pada tiga model lain memilih warna tidak
-mengubah apa pun. Sekarang aksen mewarnai palang di atas judul dan ikon akun —
-keduanya ada di semua model — dan ada tes regresi yang membandingkan hasil
-render dua aksen berbeda untuk tiap model.
+garis tepi huruf model Ceria, jadi pada model lain memilih warna tidak mengubah
+apa pun. Sekarang aksen mewarnai ikon akun di semua model, ditambah bagian
+berwarna khas tiap model — garis tepi Ceria, bayangan Miring dan Timbul, blok
+Blok, pendar Pendar. Ada tes regresi yang membandingkan hasil render dua aksen
+berbeda untuk tiap model. **Kalau menambah model baru, pastikan ia memakai
+`var(--aksen)` untuk sesuatu.**
+
+Judul kosong tidak merender apa pun — tanpa teks contoh, tanpa elemen kosong,
+dan palang aksennya ikut hilang. Thumbnail tanpa judul memang dipakai untuk
+foto yang bicara sendiri.
 
 ## Satuan di dalam kanvas
 

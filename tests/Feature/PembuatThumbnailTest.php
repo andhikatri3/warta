@@ -22,14 +22,26 @@ class PembuatThumbnailTest extends TestCase
         $this->get(route('thumbnail.riwayat'))->assertOk();
     }
 
-    public function test_judul_wajib_diisi_sebelum_disimpan(): void
+    public function test_thumbnail_tanpa_judul_boleh_disimpan(): void
     {
+        // Sebagian thumbnail memang tanpa judul: fotonya yang bicara.
         Livewire::test(PembuatThumbnail::class)
             ->set('judul', '')
             ->call('simpan')
-            ->assertHasErrors(['judul' => 'required']);
+            ->assertHasNoErrors();
 
-        $this->assertSame(0, Thumbnail::count());
+        $this->assertSame(1, Thumbnail::count());
+    }
+
+    public function test_judul_kosong_tidak_meninggalkan_teks_contoh_di_kanvas(): void
+    {
+        $html = \Illuminate\Support\Facades\Blade::render(
+            '<x-kanvas-thumbnail :ukuran="$u" judul="" subjudul="Sub" />',
+            ['u' => \App\Enums\UkuranThumbnail::Facebook],
+        );
+
+        $this->assertStringNotContainsString('Judul berita', $html);
+        $this->assertStringNotContainsString('<h2', $html);
     }
 
     public function test_menyimpan_membuat_satu_baris_thumbnail(): void

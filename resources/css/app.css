@@ -46,6 +46,17 @@
     paint-order: stroke fill;
 }
 
+/*
+ * .judul-isi adalah pembungkus dalam judul. Model Blok memasang latar pada
+ * span ini, bukan pada h2-nya, supaya latarnya menempel mengikuti kata per
+ * baris. Kalau latarnya dipasang di h2 dan display-nya diubah ke inline,
+ * line-clamp ikut rusak — pemangkas baris itu bekerja lewat display:-webkit-box.
+ */
+.judul-isi {
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+}
+
 [data-model='ceria'] {
     --font-judul: 'Fredoka', var(--font-sans);
     --bobot-judul: 700;
@@ -87,6 +98,66 @@
     color: transparent;
     -webkit-text-stroke: 0.036em rgb(48 28 4 / 0.92);
     filter: drop-shadow(0 0.035em 0.045em rgb(0 0 0 / 0.55));
+}
+
+[data-model='miring'] {
+    --font-judul: 'Anton', var(--font-sans);
+    --bobot-judul: 400;
+}
+[data-model='miring'] .judul-hias {
+    color: #fff;
+    text-transform: uppercase;
+    /* Dimiringkan dari sudut kiri bawah supaya baris-barisnya tetap rata kiri
+       di dasar kanvas, bukan menggeser menjauh tiap turun satu baris. */
+    transform: skewX(-9deg);
+    transform-origin: left bottom;
+    -webkit-text-stroke: 0.048em rgb(9 9 14 / 0.92);
+    text-shadow: 0.055em 0.055em 0 var(--aksen, #2563eb);
+    letter-spacing: 0.004em;
+}
+
+[data-model='blok'] {
+    --font-judul: 'Archivo Black', var(--font-sans);
+    --bobot-judul: 400;
+}
+[data-model='blok'] .judul-hias {
+    color: #fff;
+    text-transform: uppercase;
+    /* Blok latar butuh jarak antarbaris lebih longgar, kalau tidak blok baris
+       atas dan bawah saling menindih. */
+    line-height: 1.34;
+}
+[data-model='blok'] .judul-isi {
+    background: var(--aksen, #2563eb);
+    padding: 0.04em 0.16em;
+    box-shadow: 0 0.04em 0.09em rgb(0 0 0 / 0.5);
+}
+
+[data-model='timbul'] {
+    --font-judul: 'Fredoka', var(--font-sans);
+    --bobot-judul: 700;
+}
+[data-model='timbul'] .judul-hias {
+    color: #fff;
+    /* Dua bayangan padat tanpa kabur: yang pertama warna aksen, yang kedua
+       gelap di belakangnya, sehingga hurufnya seperti punya ketebalan. */
+    text-shadow:
+        0.032em 0.032em 0 var(--aksen, #2563eb),
+        0.066em 0.066em 0 rgb(0 0 0 / 0.55);
+}
+
+[data-model='pendar'] {
+    --font-judul: 'Bebas Neue', var(--font-sans);
+    --bobot-judul: 400;
+}
+[data-model='pendar'] .judul-hias {
+    color: #fff;
+    letter-spacing: 0.022em;
+    text-shadow:
+        0 0 0.1em var(--aksen, #2563eb),
+        0 0 0.24em var(--aksen, #2563eb),
+        0 0 0.45em var(--aksen, #2563eb),
+        0 0.04em 0.07em rgb(0 0 0 / 0.65);
 }
 
 [data-model='bersih'] {

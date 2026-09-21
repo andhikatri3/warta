@@ -84,7 +84,7 @@ class PembuatThumbnail extends Component
     protected function rules(): array
     {
         return [
-            'judul' => ['required', 'string', 'max:160'],
+            'judul' => ['nullable', 'string', 'max:160'],
             'subjudul' => ['nullable', 'string', 'max:200'],
             'model' => ['required', 'string'],
             'aksen' => ['required', 'string'],
@@ -94,7 +94,6 @@ class PembuatThumbnail extends Component
     protected function messages(): array
     {
         return [
-            'judul.required' => 'Judul belum diisi.',
             'judul.max' => 'Judul terlalu panjang, maksimal 160 karakter.',
             'unggahan.*.image' => 'Berkas :position bukan gambar.',
             'unggahan.*.mimes' => 'Gunakan JPG, PNG, atau WebP. Foto HEIC dari iPhone perlu dikonversi dulu.',
