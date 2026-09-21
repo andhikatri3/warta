@@ -26,7 +26,7 @@ Basis data: `warta` (aplikasi) dan `warta_test` (pengujian), MySQL.
 
 ## Hal yang mudah salah
 
-Empat hal berikut sudah pernah menggigit saat pembangunan. Semuanya gagal
+Lima hal berikut sudah pernah menggigit saat pembangunan. Semuanya gagal
 diam-diam — tanpa galat, tanpa layar merah.
 
 ### 1. Nama kelas Tailwind tidak boleh dirangkai dari potongan
@@ -61,7 +61,18 @@ terhitung ke klonanya, jadi tanpa `style: { transform: 'none' }` pada opsi
 `domToBlob`, berkas 1200x630 hanya berisi gambar kecil di pojok kiri atas.
 Lihat `resources/js/app.js`.
 
-### 4. Pengujian wajib MySQL
+### 4. Intervention Image 4.3 memakai `decodePath()`, bukan `read()`
+
+`ImageManager::read()` yang ada di Intervention Image 4.0–4.2 **dihapus** di
+4.3; penggantinya `decode()` dengan varian `decodePath()`, `decodeBinary()`,
+dan seterusnya. Banyak contoh di luar sana masih memakai `read()`, dan
+kesalahannya baru muncul saat ada yang benar-benar mengunggah foto.
+
+Karena itu `PenyimpanFotoTest` mengunggah berkas gambar sungguhan, bukan tiruan.
+Apa pun yang menyentuh pustaka gambar harus dilalui tes yang benar-benar
+menghasilkan berkas — membaca tanda tangan metodenya saja tidak cukup.
+
+### 5. Pengujian wajib MySQL
 
 `phpunit.xml` diarahkan ke `warta_test`, bukan sqlite — PHP di mesin
 pengembangan ini tidak punya driver sqlite.

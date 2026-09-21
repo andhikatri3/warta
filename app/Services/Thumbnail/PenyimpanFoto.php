@@ -37,7 +37,7 @@ class PenyimpanFoto
 
     public function simpanFoto(UploadedFile $berkas): string
     {
-        $gambar = Image::read($berkas->getRealPath())
+        $gambar = Image::decodePath($berkas->getRealPath())
             ->orient()
             ->scaleDown(width: self::SISI_MAKS, height: self::SISI_MAKS);
 
@@ -49,7 +49,7 @@ class PenyimpanFoto
 
     public function simpanLogo(UploadedFile $berkas): string
     {
-        $gambar = Image::read($berkas->getRealPath())
+        $gambar = Image::decodePath($berkas->getRealPath())
             ->orient()
             ->scaleDown(width: self::SISI_LOGO_MAKS, height: self::SISI_LOGO_MAKS);
 

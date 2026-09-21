@@ -95,7 +95,9 @@
                                 >
 
                                 <div class="min-w-0 flex-1 text-xs text-slate-500">
-                                    @if ($i === 0 && $jumlahFoto > 1)
+                                    @if ($jumlahFoto === 1)
+                                        <span class="font-semibold text-slate-700">Foto tunggal</span>
+                                    @elseif ($i === 0)
                                         <span class="font-semibold text-slate-700">Foto utama</span>
                                     @else
                                         <span>Pendamping</span>
