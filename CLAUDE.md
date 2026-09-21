@@ -4,8 +4,8 @@ Alat internal untuk menyusun berita dan thumbnail-nya. Dua fitur:
 
 1. **Thumbnail kolase** — beberapa foto disusun jadi satu gambar, dirender ke
    tiga ukuran siap bagikan.
-2. **Menulis berita dari 5W+1H** — bahan disusun model Claude menjadi naskah
-   berikut tiga alternatif judul.
+2. **Menulis berita dari 5W+1H** — bahan disusun jadi naskah berikut tiga
+   alternatif judul, lewat Gemini atau Claude.
 
 Keduanya sudah jalan dan saling tersambung: tombol di halaman berita membuka
 pembuat thumbnail dengan judulnya sudah terisi.
@@ -29,17 +29,31 @@ php artisan serve
 
 Basis data: `warta` (aplikasi) dan `warta_test` (pengujian), MySQL.
 
-Menulis berita butuh `ANTHROPIC_API_KEY` di `.env`. Tanpa kunci, halamannya
-tetap terbuka dan formulirnya tetap bisa diisi — yang muncul pesan yang
-menjelaskan kunci belum diisi, bukan layar galat.
+Menulis berita bawaannya memakai **Gemini** (`PENULIS_BERITA=gemini` di
+`.env`), karena tier gratisnya (sekitar 1.500 permintaan/hari) sudah cukup
+untuk pemakaian satu desa — lihat `config/gemini.php`. Tanpa `GEMINI_API_KEY`
+terisi, halamannya tetap terbuka dan formulirnya tetap bisa diisi; yang muncul
+pesan yang menjelaskan kunci belum diisi dan tempat mengambilnya, bukan layar
+galat.
+
+Claude tersedia sebagai pilihan kedua untuk berita yang butuh kualitas lebih:
+ganti `PENULIS_BERITA=claude` dan isi `ANTHROPIC_API_KEY` — lihat
+`config/anthropic.php`. Anthropic **berbayar per token**, tidak seperti
+Gemini yang punya tier gratis permanen.
 
 ## Menulis berita
 
 Pembagian tugasnya disengaja: **penyusun bertanggung jawab atas kebenaran
 fakta, model hanya atas bentuk kalimat.** Model tidak meliput, tidak mencari
 data, dan tidak tahu apa pun di luar `BahanBerita`. Prompt sistem di
-`PenulisClaude` melarangnya menambah nama, angka, tanggal, tempat, atau
-lembaga yang tidak ada di bahan, dan melarangnya mengarang kutipan.
+`PromptBerita` — dipakai bersama oleh `PenulisGemini` maupun `PenulisClaude` —
+melarangnya menambah nama, angka, tanggal, tempat, atau lembaga yang tidak ada
+di bahan, dan melarangnya mengarang kutipan.
+
+**Kenapa prompt-nya satu berkas untuk dua penyedia:** kalau tiap penyedia
+menyimpan salinan prompt sendiri, cepat atau lambat salah satunya tertinggal
+saat aturannya diperketat — dan tidak ada yang menyadarinya sampai ada berita
+yang memuat nama pejabat yang tidak pernah hadir.
 
 Dua rinci yang mudah dianggap remeh:
 
@@ -50,23 +64,48 @@ Dua rinci yang mudah dianggap remeh:
   perintah menyalin huruf demi huruf; model hanya boleh menambahkan kalimat
   pengantar.
 
-Naskahnya diminta lewat structured output (`outputConfig.format` dengan skema
-JSON), bukan diurai dari teks bebas. Catatan SDK: `parsedOutput()` hanya
-bekerja untuk kelas `StructuredOutputModel`; dengan skema mentah seperti di
-sini, isinya dibaca dari blok teks pertama lalu `json_decode` sendiri.
+Naskahnya diminta lewat structured output — skema JSON dari
+`PromptBerita::skema()` — bukan diurai dari teks bebas. Skema intinya sengaja
+minimal (cuma `type`, `properties`, `items`, `description`, `required`) supaya
+diterima kedua penyedia; kata kunci ketat seperti `additionalProperties` dan
+`minItems`/`maxItems` hanya ditambahkan di `PenulisClaude::skema()`, karena
+Gemini menolaknya dengan galat 400 kalau ada kata kunci yang tak dikenal.
+Jumlah judul yang tidak pas 3 tetap ditoleransi di `NaskahBerita::dariLarik()`.
 
 Bahan 5W+1H ikut tersimpan di kolom `bahan` bersama naskahnya, jadi asal tiap
 kalimat bisa ditelusuri dan berita bisa ditulis ulang dengan gaya lain tanpa
 mengetik faktanya dari awal.
 
-Penulisnya di balik kontrak `App\Contracts\PenulisBerita`. Pengujian menukarnya
-dengan `Tests\Dukungan\PenulisTiruan` — **rangkaian tes tidak boleh pernah
-memanggil layanan berbayar.** Kalau menambah tes yang menyentuh jalur ini,
-pasang tiruannya lewat `$this->app->instance(...)`.
+### Dua cara memanggil model, dan kenapa
 
-Model dan kedalaman berpikirnya diatur di `config/anthropic.php`. `effort`
+`PenulisClaude` memakai SDK resmi (`anthropic-ai/sdk`); `PenulisGemini`
+memakai `Illuminate\Support\Facades\Http` langsung ke Interactions API. Bukan
+kelalaian — Gemini belum lama pindah ke Interactions API dan bentuknya
+sempat berubah memutus, jadi header `Api-Revision` dipaku di
+`config/gemini.php` supaya perubahan berikutnya tidak diam-diam merusak
+aplikasi ini. Memakai `Http::fake()` juga berarti bentuk permintaan dan cara
+membaca balasannya benar-benar teruji di `PenulisGeminiTest`, bukan cuma
+diasumsikan benar.
+
+**Balasan Interactions API bukan di `output_text`.** Itu properti bantu di
+pustaka resmi (kalau dipakai), bukan ruas yang benar-benar dikirim di kawat.
+Yang datang adalah larik `outputs`, isinya bisa lebih dari satu blok bertipe
+`text` yang harus disambung — lihat `PenulisGemini::uraikan()`.
+
+Penulisnya di balik kontrak `App\Contracts\PenulisBerita`, diikat lewat
+`config('penulis.driver')` di `AppServiceProvider`. Pengujian menukarnya
+dengan `Tests\Dukungan\PenulisTiruan` lewat `$this->app->instance(...)` —
+`instance()` selalu menang atas pengikatan berbasis konfigurasi, jadi ini
+tetap berlaku walau drivernya diganti. **Rangkaian tes tidak boleh pernah
+memanggil layanan sungguhan**, berbayar maupun gratis.
+
+Model dan kedalaman berpikir Claude diatur di `config/anthropic.php`. `effort`
 ditahan di `medium` karena tugasnya mengarang dari fakta yang sudah ada, bukan
-menalar; naikkan kalau hasilnya dangkal.
+menalar; naikkan kalau hasilnya dangkal. Model Gemini diatur di
+`config/gemini.php` — bawaannya `gemini-2.5-flash` karena hanya varian Flash
+yang ada di tier gratis (Pro dicabut dari tier gratis April 2026); kuota
+persisnya cuma bisa dilihat di aistudio.google.com/rate-limit, bukan di
+dokumentasi.
 
 ## Hal yang mudah salah
 

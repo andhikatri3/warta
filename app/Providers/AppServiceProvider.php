@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use App\Contracts\PenulisBerita;
-use App\Services\Berita\PenulisClaude;
 use Illuminate\Support\ServiceProvider;
+use InvalidArgumentException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,8 +15,20 @@ class AppServiceProvider extends ServiceProvider
     {
         // Diikat lewat kontrak supaya pengujian bisa menukarnya dengan penulis
         // tiruan — tanpa itu setiap kali rangkaian tes berjalan akan ada
-        // panggilan berbayar ke layanan model.
-        $this->app->bind(PenulisBerita::class, PenulisClaude::class);
+        // panggilan ke layanan model, sebagian berbayar.
+        $this->app->bind(PenulisBerita::class, function () {
+            $driver = (string) config('penulis.driver');
+            $kelas = config('penulis.penyedia.'.$driver);
+
+            if (! $kelas) {
+                throw new InvalidArgumentException(
+                    "Penulis berita '{$driver}' tidak dikenal. Pilihannya: "
+                    .implode(', ', array_keys(config('penulis.penyedia', [])))
+                );
+            }
+
+            return $this->app->make($kelas);
+        });
     }
 
     /**
