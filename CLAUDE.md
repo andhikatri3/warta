@@ -70,7 +70,7 @@ menalar; naikkan kalau hasilnya dangkal.
 
 ## Hal yang mudah salah
 
-Tujuh hal berikut sudah pernah menggigit saat pembangunan. Semuanya gagal
+Delapan hal berikut sudah pernah menggigit saat pembangunan. Semuanya gagal
 diam-diam — tanpa galat, tanpa layar merah.
 
 ### 1. Nama kelas Tailwind tidak boleh dirangkai dari potongan
@@ -137,7 +137,27 @@ di bawahnya mengawasi `attributes: ['style']`, bukan hanya `childList`.
 Penjaganya ada di `hitungSkala()`: nilai yang sudah sama tidak ditulis ulang —
 tanpa itu pengamat dan penulis saling memanggil tanpa henti.
 
-### 7. Pengujian wajib MySQL
+### 7. line-clamp memotong ekor huruf kalau leading terlalu rapat
+
+`line-clamp` bekerja dengan `overflow: hidden`. Judul memakai `leading-[1.06]`,
+lebih rapat daripada tinggi huruf seutuhnya — kotaknya 66,8 piksel sementara
+isinya 75,8 — dan selisih yang meluber ke bawah itulah yang terpotong. "Penunggul"
+kehilangan ekor g-nya.
+
+Gejalanya menipu: hanya tampak pada model tanpa kapital (Ceria, Agung, Timbul,
+Bersih); model berkapital terlihat baik-baik saja karena huruf besar tidak
+berekor. Mudah dikira masalah huruf, padahal masalah kotak.
+
+Penawarnya ada di `.judul-kanvas`: `padding-bottom: 0.16em` memberi ruang
+sebelum tepi pemotongan, `margin-bottom: -0.16em` mengembalikan tata letaknya.
+Keduanya sepasang — menghapus salah satu merusak yang lain.
+
+Tidak ada tes PHPUnit untuk ini: yang salah adalah metrik huruf saat dirender,
+bukan markup. Memeriksanya berarti merender kanvas di peramban lalu mengukur
+kotak `h2` terhadap kotak `.judul-isi` — kalau tingginya kurang, ekor huruf
+sedang terpotong.
+
+### 8. Pengujian wajib MySQL
 
 `phpunit.xml` diarahkan ke `warta_test`, bukan sqlite — PHP di mesin
 pengembangan ini tidak punya driver sqlite.

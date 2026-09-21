@@ -44,6 +44,23 @@
     font-family: var(--font-judul, var(--font-sans));
     font-weight: var(--bobot-judul, 800);
     paint-order: stroke fill;
+
+    /*
+     * Ruang bagi ekor huruf g, j, p, y — lalu ditarik kembali.
+     *
+     * line-clamp bekerja dengan overflow: hidden, dan jarak antarbaris judul
+     * (1.06) lebih rapat daripada tinggi huruf seutuhnya: kotaknya 66,8 piksel
+     * sementara isinya 75,8. Selisihnya meluber ke atas dan ke bawah, dan yang
+     * di bawah itulah yang terpotong — "Penunggul" kehilangan ekor g-nya.
+     * Hanya tampak pada model tanpa kapital (Ceria, Agung, Timbul, Bersih);
+     * model berkapital selamat karena huruf besar memang tak berekor.
+     *
+     * Pemotongan terjadi di tepi kotak padding, jadi padding bawah memberi
+     * ruang. Margin negatif seukurannya mengembalikan tata letak seperti
+     * semula, sehingga jarak ke subjudul tidak ikut bergeser.
+     */
+    padding-bottom: 0.16em;
+    margin-bottom: -0.16em;
 }
 
 /*
