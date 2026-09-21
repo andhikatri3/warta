@@ -95,9 +95,12 @@
             @endif
 
             {{-- Akun resmi desa. Ikonnya ikut warna aksen, teksnya tetap putih
-                 supaya terbaca di atas foto apa pun. --}}
+                 supaya terbaca di atas foto apa pun. Margin kiri menggesernya
+                 sedikit dari tepi padding kolom teks — supaya tidak mepet
+                 rata dengan judul dan subjudul di atasnya, tampak lebih ke
+                 tengah. --}}
             @if ($sosmed !== [])
-                <div class="mt-[0.32em] flex flex-wrap items-center gap-x-[0.45em] gap-y-[0.12em]">
+                <div class="mt-[0.32em] ml-[0.25em] flex flex-wrap items-center gap-x-[0.45em] gap-y-[0.12em]">
                     @foreach ($sosmed as $s)
                         <span class="flex items-center gap-[0.34em] text-[0.23em] font-bold leading-none text-white [text-shadow:0_0.07em_0.09em_rgb(0_0_0/0.85)]">
                             <x-dynamic-component
@@ -112,8 +115,12 @@
             @endif
         </div>
 
+        {{-- Margin kanan menggesernya sedikit dari tepi padding baris —
+             logonya tidak mepet rata di sudut kanvas, tampak lebih ke
+             tengah, sepasang dengan margin kiri pada baris akun di sisi
+             satunya. --}}
         @if ($logo)
-            <img src="{{ $logo }}" alt="" class="h-[0.95em] w-auto shrink-0 object-contain [filter:drop-shadow(0_0.04em_0.06em_rgb(0_0_0/0.5))]">
+            <img src="{{ $logo }}" alt="" class="mr-[0.25em] h-[0.95em] w-auto shrink-0 object-contain [filter:drop-shadow(0_0.04em_0.06em_rgb(0_0_0/0.5))]">
         @endif
     </div>
 </div>
