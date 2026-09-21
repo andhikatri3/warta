@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/*
+ * Kelas Tailwind untuk susunan kolase dirakit di PHP, bukan ditulis di Blade,
+ * jadi pemindai harus diarahkan ke app/ juga — kalau tidak, grid-cols-[1.5fr_1fr]
+ * dan kawan-kawannya tidak pernah ikut terbangun dan kolasenya runtuh menjadi
+ * satu kolom tanpa memunculkan galat apa pun.
+ */
+@source '../../app';
+
+@theme {
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system,
+        'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+}
+
+/*
+ * Kanvas thumbnail selalu dirender pada ukuran piksel sebenarnya supaya hasil
+ * tangkapannya tepat, lalu dikecilkan hanya untuk dilihat. Skalanya dihitung
+ * di JavaScript dari lebar wadahnya, karena lebar itu ditentukan tata letak
+ * yang tanggap layar dan belum diketahui saat Blade dirender.
+ */
+[data-pratinjau] > [data-kanvas] {
+    /*
+     * Dikeluarkan dari alur supaya tinggi wadahnya ditentukan oleh
+     * aspect-ratio, bukan oleh kanvas setinggi 1920 piksel di dalamnya —
+     * transform mengecilkan tampilan, tetapi tidak mengubah ruang yang
+     * ditempati elemen dalam tata letak.
+     */
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: scale(var(--skala, 1));
+    transform-origin: top left;
+}
