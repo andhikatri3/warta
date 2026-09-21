@@ -232,6 +232,31 @@ yang harus dihitung ulang. Yang menjaganya tetap terkendali adalah `klemJudul()`
 dan `klemSubjudul()`: luapan di kanvas berukuran tetap tidak memunculkan bilah
 gulir, ia hanya terpotong diam-diam di tempat yang tidak terduga.
 
+## Berkas unduhan
+
+JPEG, bukan PNG. Isinya foto, dan PNG menyimpan foto dengan sangat boros —
+Story 1080x1920 bisa menembus beberapa megabita, cukup untuk dipadatkan sendiri
+oleh aplikasi sosial media dengan hasil yang tidak kita kendalikan. Tidak ada
+alfa yang perlu dijaga: kanvasnya selalu berlatar penuh. Logo tetap disimpan
+PNG di disk supaya transparansinya utuh sampai saat kanvas diratakan.
+
+`backgroundColor: '#ffffff'` wajib ada. JPEG tidak punya alfa, dan piksel
+tembus pandang tanpa alas akan menjadi hitam.
+
+Mutunya turun sendiri hanya kalau perlu — lihat `padatkan()` di `app.js`.
+Diukur dengan foto berderau (kasus terburuk): Facebook 323 KB dan Persegi
+525 KB selesai di mutu 0.92, Story turun ke 0.84 dan mendarat di 725 KB. Satu
+mutu tetap tidak bisa menjanjikan keduanya: pada 0.92 Story mendarat di 0.97 MB,
+lolos tapi setipis itu dari gagal.
+
+Penyandian ulangnya murah karena gambarnya tidak dirender ulang — `domToCanvas`
+menghasilkan kanvas sekali, lalu kanvas yang sama dikodekan lagi dengan mutu
+berbeda. Karena itu di sini dipakai `domToCanvas`, bukan `domToBlob`.
+
+Ukur dengan foto berderau, jangan dengan gambar bergradasi mulus: gradasi
+terkompresi jauh lebih kecil daripada foto asli dan memberi angka yang
+menyenangkan tapi bohong.
+
 ## Akun resmi di kanvas
 
 Baris akun di bawah subjudul datang dari `config/warta.php`, bukan dari

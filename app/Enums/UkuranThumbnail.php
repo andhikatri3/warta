@@ -120,11 +120,6 @@ enum UkuranThumbnail: string
         };
     }
 
-    public function berkas(string $dasar): string
-    {
-        return $dasar.'-'.$this->value.'-'.$this->lebar().'x'.$this->tinggi().'.png';
-    }
-
     /** @return array<int, self> */
     public static function semua(): array
     {

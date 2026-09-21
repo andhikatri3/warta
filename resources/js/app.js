@@ -1,4 +1,4 @@
-import { domToBlob } from 'modern-screenshot'
+import { domToCanvas } from 'modern-screenshot'
 
 /*
  * Kanvas thumbnail hidup di DOM pada ukuran piksel sebenarnya — 1200x630 dan
@@ -81,18 +81,56 @@ async function tangkap(kanvas) {
     if (document.fonts?.ready) await document.fonts.ready
     await tungguGambar(kanvas)
 
-    return domToBlob(kanvas, {
+    const gambar = await domToCanvas(kanvas, {
         width: Number(kanvas.dataset.lebar),
         height: Number(kanvas.dataset.tinggi),
         scale: 1,
-        type: 'image/png',
+
+        // Wajib untuk JPEG: format ini tidak punya alfa, jadi piksel yang
+        // tembus pandang akan menjadi hitam kalau tidak diberi alas.
         backgroundColor: '#ffffff',
+
         // Kanvas sedang dikecilkan oleh transform milik wadah pratinjau, dan
         // modern-screenshot menyalin gaya terhitung apa adanya ke klonanya.
         // Tanpa penawar ini, berkas yang terunduh ikut mengecil sesuai skala
         // layar — 1200x630 berisi gambar 420 piksel di pojok kiri atas.
         style: { transform: 'none', transformOrigin: 'top left' },
     })
+
+    return padatkan(gambar)
+}
+
+/** Batas besar berkas yang dijanjikan ke pemakai. */
+const BATAS_BYTE = 950 * 1024
+
+/**
+ * Mengubah kanvas menjadi JPEG di bawah batas ukuran.
+ *
+ * JPEG, bukan PNG: isinya foto, dan PNG menyimpannya dengan sangat boros —
+ * Story 1080x1920 bisa menembus beberapa megabita, cukup untuk dipadatkan
+ * sendiri oleh aplikasi sosial media dengan hasil yang tidak kita kendalikan.
+ * Tidak ada alfa yang perlu dijaga: kanvasnya selalu berlatar penuh.
+ *
+ * Mutunya menurun hanya kalau perlu. Foto yang tenang selesai di 0.92 dan
+ * tetap tajam; yang ramai — dedaunan, kerumunan, tekstur halus — baru turun.
+ * Satu mutu tetap tidak bisa menjanjikan keduanya: pada 0.92 Story berfoto
+ * ramai mendarat di 0.97 MB, lolos tapi setipis itu dari gagal.
+ *
+ * Penyandian ulang di sini murah karena gambarnya tidak dirender ulang —
+ * kanvas yang sama dikodekan lagi dengan mutu berbeda.
+ */
+async function padatkan(gambar) {
+    const keBlob = (mutu) =>
+        new Promise((selesai) => gambar.toBlob(selesai, 'image/jpeg', mutu))
+
+    let blob = await keBlob(0.92)
+
+    for (const mutu of [0.84, 0.76, 0.68, 0.6]) {
+        if (blob && blob.size <= BATAS_BYTE) break
+        blob = await keBlob(mutu)
+    }
+
+    return blob
 }
 
 function unduhBlob(blob, nama) {
@@ -107,7 +145,7 @@ function unduhBlob(blob, nama) {
 
     // Anchor dan URL blob dilepas lama sesudah diklik, bukan seketika.
     // Menekan tombol hanya memulai unduhan — peramban masih membaca dari URL
-    // blob ini sesudahnya, dan PNG Story 1080x1920 tidak selalu selesai dalam
+    // blob ini sesudahnya, dan Story 1080x1920 tidak selalu selesai dalam
     // sekejap. Jangka selebar ini murni kehati-hatian; blob-nya toh ikut
     // terlepas sendiri saat halaman ditinggalkan.
     setTimeout(() => {
@@ -125,7 +163,7 @@ async function unduhUkuran(ukuran, dasar) {
     const blob = await tangkap(kanvas)
     const { lebar, tinggi } = kanvas.dataset
 
-    unduhBlob(blob, `${dasar}-${ukuran}-${lebar}x${tinggi}.png`)
+    unduhBlob(blob, `${dasar}-${ukuran}-${lebar}x${tinggi}.jpg`)
 }
 
 /* ------------------------------------------------------------------ *

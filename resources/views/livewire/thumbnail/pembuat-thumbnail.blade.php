@@ -312,7 +312,7 @@
                         data-unduh="{{ $u->value }}"
                         data-nama="{{ $namaDasar }}"
                         class="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 transition hover:border-slate-900 hover:text-slate-900 disabled:opacity-50"
-                    >Unduh PNG</button>
+                    >Unduh JPG</button>
                 </section>
             @endforeach
         </div>
