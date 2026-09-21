@@ -20,6 +20,13 @@
 
     $letak = TataLetakKolase::untuk($ukuran, count($foto));
     $sosmed = config('warta.sosmed', []);
+
+    // Bingkai kertas + bayangan tipis, hanya saat lebih dari satu foto. Foto
+    // tunggal sudah memenuhi seluruh kanvas — menambah bingkai di situ hanya
+    // menambah batas yang tidak perlu di sekeliling gambar yang memang harus
+    // penuh. Ini keputusan otomatis dari jumlah foto, bukan pilihan yang perlu
+    // diatur pemakai: tidak ada kolom baru, tidak ada kontrol baru di formulir.
+    $berbingkai = count($foto) > 1;
 @endphp
 
 <div
@@ -35,13 +42,21 @@
          border yang harus dihitung ulang tiap kali susunannya berubah. --}}
     <div class="absolute inset-0 grid gap-[0.045em] bg-white {{ $letak['wadah'] }}">
         @forelse ($foto as $i => $f)
-            <div class="relative overflow-hidden bg-slate-200 {{ $letak['sel'][$i] ?? '' }}">
-                <img
-                    src="{{ $f['url'] }}"
-                    alt=""
-                    class="h-full w-full object-cover"
-                    style="object-position: {{ $f['fokus_x'] ?? 50 }}% {{ $f['fokus_y'] ?? 50 }}%;"
-                >
+            {{-- Bingkai dibuat lewat padding pada sel luar (kertas putih di
+                 sekeliling) plus sudut membulat + bayangan pada pembungkus
+                 dalam (foto tampak tertempel, bukan menyatu rata dengan sel
+                 di sebelahnya). Satu markup untuk kedua kondisi, tinggal kelas
+                 mana yang aktif — supaya tidak ada gambar yang dirender dua
+                 kali dan perbedaan foto tunggal vs kolase hanya soal kelas. --}}
+            <div class="relative overflow-hidden {{ $letak['sel'][$i] ?? '' }} {{ $berbingkai ? 'bg-white p-[0.07em]' : '' }}">
+                <div class="h-full w-full overflow-hidden bg-slate-200 {{ $berbingkai ? 'rounded-[0.045em] shadow-[0_0.055em_0.13em_rgb(0_0_0/0.4)]' : '' }}">
+                    <img
+                        src="{{ $f['url'] }}"
+                        alt=""
+                        class="h-full w-full object-cover"
+                        style="object-position: {{ $f['fokus_x'] ?? 50 }}% {{ $f['fokus_y'] ?? 50 }}%;"
+                    >
+                </div>
             </div>
         @empty
             <div class="flex items-center justify-center bg-slate-100">

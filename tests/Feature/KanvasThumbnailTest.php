@@ -126,6 +126,21 @@ class KanvasThumbnailTest extends TestCase
         );
     }
 
+    /**
+     * Bingkai hanya masuk akal saat ada lebih dari satu foto untuk
+     * dibedakan satu sama lain. Foto tunggal sudah memenuhi seluruh kanvas,
+     * jadi menambah bingkai di situ hanya menambah batas yang tidak perlu.
+     */
+    public function test_bingkai_muncul_hanya_saat_lebih_dari_satu_foto(): void
+    {
+        $satu = $this->render(UkuranThumbnail::Facebook, $this->foto(1));
+        $tiga = $this->render(UkuranThumbnail::Facebook, $this->foto(3));
+
+        $this->assertStringNotContainsString('p-[0.07em]', $satu);
+        $this->assertStringContainsString('p-[0.07em]', $tiga);
+        $this->assertStringContainsString('rounded-[0.045em]', $tiga);
+    }
+
     public function test_foto_melebihi_batas_tidak_ikut_dirender(): void
     {
         $html = $this->render(UkuranThumbnail::Facebook, $this->foto(7));
