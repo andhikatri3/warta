@@ -27,7 +27,8 @@ class PenulisClaude implements PenulisBerita
 
         if (trim($kunci) === '') {
             throw new GagalMenulis(
-                'Kunci API Anthropic belum diisi. Tambahkan ANTHROPIC_API_KEY di berkas .env, lalu muat ulang halaman ini.'
+                'Kunci API Anthropic belum diisi. Ambil kuncinya di console.anthropic.com '
+                .'(menu API Keys), isikan ke ANTHROPIC_API_KEY di berkas .env, lalu muat ulang halaman ini.'
             );
         }
 
