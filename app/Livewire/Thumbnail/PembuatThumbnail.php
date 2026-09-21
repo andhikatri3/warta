@@ -9,7 +9,6 @@ use App\Enums\UkuranThumbnail;
 use App\Models\Thumbnail;
 use App\Services\Thumbnail\PenyimpanFoto;
 use App\Support\TataLetakKolase;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -26,10 +25,6 @@ class PembuatThumbnail extends Component
     public string $judul = '';
 
     public ?string $subjudul = null;
-
-    public ?string $label = 'BERITA';
-
-    public ?string $tanggal = null;
 
     public string $gaya = GayaThumbnail::Overlay->value;
 
@@ -63,8 +58,6 @@ class PembuatThumbnail extends Component
 
     public function mount(?Thumbnail $thumbnail = null): void
     {
-        $this->tanggal = now()->toDateString();
-
         if (! $thumbnail?->exists) {
             // Datang dari halaman berita lewat tombol "Buat thumbnail": judulnya
             // dibawa di kueri supaya tidak perlu disalin tangan. Dipangkas ke
@@ -78,8 +71,6 @@ class PembuatThumbnail extends Component
         $this->thumbnailId = $thumbnail->id;
         $this->judul = $thumbnail->judul;
         $this->subjudul = $thumbnail->subjudul;
-        $this->label = $thumbnail->label;
-        $this->tanggal = $thumbnail->tanggal?->toDateString();
         $this->gaya = $thumbnail->gaya->value;
         $this->model = $thumbnail->model_teks->value;
         $this->aksen = $thumbnail->aksen->value;
@@ -99,8 +90,6 @@ class PembuatThumbnail extends Component
         return [
             'judul' => ['required', 'string', 'max:160'],
             'subjudul' => ['nullable', 'string', 'max:200'],
-            'label' => ['nullable', 'string', 'max:30'],
-            'tanggal' => ['nullable', 'date'],
             'gaya' => ['required', 'string'],
             'model' => ['required', 'string'],
             'aksen' => ['required', 'string'],
@@ -232,8 +221,6 @@ class PembuatThumbnail extends Component
         $thumbnail->fill([
             'judul' => $this->judul,
             'subjudul' => $this->subjudul,
-            'label' => $this->label,
-            'tanggal' => $this->tanggal,
             'gaya' => $this->gaya,
             'model_teks' => $this->model,
             'aksen' => $this->aksen,
@@ -278,14 +265,6 @@ class PembuatThumbnail extends Component
     public function aksenTerpilih(): Aksen
     {
         return Aksen::tryFrom($this->aksen) ?? Aksen::Biru;
-    }
-
-    #[Computed]
-    public function tanggalTampil(): ?string
-    {
-        return $this->tanggal
-            ? Carbon::parse($this->tanggal)->translatedFormat('j F Y')
-            : null;
     }
 
     #[Computed]

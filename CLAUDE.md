@@ -186,9 +186,28 @@ terhadap font-size elemen itu sendiri, bukan terhadap kanvas. Jangan
 menyarangkan `text-[...]` di dalam `text-[...]`.
 
 `tinggiPita()` bukan selera: angkanya hasil menjumlahkan isi terburuk yang masih
-boleh muat. Kalau judul atau subjudul diperbesar, hitung ulang — kekurangan
-belasan piksel tidak terlihat di pratinjau kecil, yang tampak hanya subjudul
-yang hilang separuh di berkas jadinya.
+boleh muat — judul sepenuh batas barisnya, subjudul, baris akun, dan padding.
+Kalau salah satunya diperbesar, hitung ulang; kekurangan belasan piksel tidak
+terlihat di pratinjau kecil, yang tampak hanya subjudul yang hilang separuh di
+berkas jadinya.
+
+## Akun resmi di kanvas
+
+Baris akun di bawah subjudul datang dari `config/warta.php`, bukan dari
+formulir maupun basis data: nilainya sama untuk semua thumbnail dan hampir tak
+pernah berubah, jadi mengetiknya ulang tiap kali hanya membuka peluang salah
+ketik yang baru ketahuan setelah gambarnya tersebar. Ganti lewat `.env`
+(`WARTA_FACEBOOK`, `WARTA_INSTAGRAM`, `WARTA_WEB`); akun yang dikosongkan
+hilang sendiri dari barisnya, tanpa menyisakan ikon yatim.
+
+Ikonnya komponen Blade di `resources/views/components/ikon/`, dipanggil lewat
+`<x-dynamic-component>` dari nilai `ikon` pada konfigurasi. SVG sebaris, bukan
+berkas terpisah — berkas gambar lintas asal akan menajiskan kanvas saat
+ditangkap, sama seperti foto.
+
+Label dan tanggal **sudah dicabut** dari kanvas beserta kolomnya. Kalau nanti
+diminta kembali, migrasi `2026_09_21_000005` punya `down()` yang memulihkan
+kolomnya.
 
 ## Perawatan
 

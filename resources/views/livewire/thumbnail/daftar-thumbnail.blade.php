@@ -41,8 +41,6 @@
                             :ukuran="UkuranThumbnail::Facebook"
                             :judul="$item->judul"
                             :subjudul="$item->subjudul"
-                            :label="$item->label"
-                            :tanggal="$item->tanggal?->translatedFormat('j F Y')"
                             :gaya="$item->gaya"
                             :model="$item->model_teks"
                             :aksen="$item->aksen"

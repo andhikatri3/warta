@@ -2,8 +2,6 @@
     'ukuran',
     'judul' => '',
     'subjudul' => null,
-    'label' => null,
-    'tanggal' => null,
     'gaya' => null,
     'model' => null,
     'aksen' => null,
@@ -29,6 +27,7 @@
     $tinggiKolase = $berpita ? $ukuran->tinggi() - $ukuran->tinggiPita() : $ukuran->tinggi();
     $klemJudul = $ukuran->klemJudul();
     $klemSubjudul = $ukuran->klemSubjudul();
+    $sosmed = config('warta.sosmed', []);
 @endphp
 
 <div
@@ -70,23 +69,9 @@
             <span class="absolute inset-x-0 top-0" style="height: 0.09em; background: {{ $aksen->heks() }};"></span>
 
             <div class="min-w-0 flex-1">
-                @if ($label || $tanggal)
-                    <div class="flex items-center gap-[0.25em]">
-                        @if ($label)
-                            <span
-                                class="rounded-[0.15em] px-[0.7em] py-[0.32em] text-[0.19em] font-bold uppercase leading-none tracking-[0.13em] text-white"
-                                style="background: {{ $aksen->heks() }};"
-                            >{{ $label }}</span>
-                        @endif
-                        @if ($tanggal)
-                            <span class="text-[0.2em] font-semibold {{ $terang ? 'text-slate-400' : 'text-slate-500' }}">{{ $tanggal }}</span>
-                        @endif
-                    </div>
-                @endif
-
                 {{-- Di dalam pita judul hanya memakai hurufnya, tanpa garis tepi:
                      latarnya sudah polos, jadi tidak ada yang perlu dilawan. --}}
-                <h2 class="judul-kanvas mt-[0.17em] {{ $klemJudul }} text-[0.76em] leading-[1.13] tracking-[-0.025em] {{ $terang ? 'text-slate-900' : 'text-white' }}">
+                <h2 class="judul-kanvas {{ $klemJudul }} text-[0.76em] leading-[1.13] tracking-[-0.025em] {{ $terang ? 'text-slate-900' : 'text-white' }}">
                     {{ $judul ?: 'Judul berita' }}
                 </h2>
 
@@ -94,6 +79,21 @@
                     <p class="mt-[0.5em] {{ $klemSubjudul }} text-[0.26em] font-medium leading-[1.4] {{ $terang ? 'text-slate-500' : 'text-slate-400' }}">
                         {{ $subjudul }}
                     </p>
+                @endif
+
+                @if ($sosmed !== [])
+                    <div class="mt-[0.3em] flex flex-wrap items-center gap-x-[0.42em] gap-y-[0.12em]">
+                        @foreach ($sosmed as $s)
+                            <span class="flex items-center gap-[0.32em] text-[0.21em] font-bold leading-none {{ $terang ? 'text-slate-500' : 'text-slate-300' }}">
+                                <x-dynamic-component
+                                    :component="'ikon.'.$s['ikon']"
+                                    class="size-[1.25em] shrink-0"
+                                    style="color: {{ $aksen->heks() }};"
+                                />
+                                {{ $s['akun'] }}
+                            </span>
+                        @endforeach
+                    </div>
                 @endif
             </div>
 
@@ -109,21 +109,7 @@
         <div class="absolute inset-x-0 bottom-0 flex items-end gap-[0.45em] px-[0.6em] pb-[0.6em] pt-[1.7em]"
              style="background: linear-gradient(to top, rgba(2,6,23,0.88) 0%, rgba(2,6,23,0.62) 42%, rgba(2,6,23,0) 100%);">
             <div class="min-w-0 flex-1">
-                @if ($label || $tanggal)
-                    <div class="flex items-center gap-[0.25em]">
-                        @if ($label)
-                            <span
-                                class="rounded-[0.15em] px-[0.7em] py-[0.32em] text-[0.19em] font-bold uppercase leading-none tracking-[0.13em] text-white"
-                                style="background: {{ $aksen->heks() }};"
-                            >{{ $label }}</span>
-                        @endif
-                        @if ($tanggal)
-                            <span class="text-[0.2em] font-semibold text-slate-200 [text-shadow:0_0.05em_0.06em_rgb(0_0_0/0.7)]">{{ $tanggal }}</span>
-                        @endif
-                    </div>
-                @endif
-
-                <h2 class="judul-kanvas judul-hias mt-[0.22em] {{ $klemJudul }} text-[1.15em] leading-[1.06] tracking-[-0.015em]">
+                <h2 class="judul-kanvas judul-hias {{ $klemJudul }} text-[1.15em] leading-[1.06] tracking-[-0.015em]">
                     {{ $judul ?: 'Judul berita' }}
                 </h2>
 
@@ -131,6 +117,22 @@
                     <p class="mt-[0.45em] {{ $klemSubjudul }} text-[0.3em] font-semibold leading-[1.4] text-white [text-shadow:0_0.06em_0.08em_rgb(0_0_0/0.8)]">
                         {{ $subjudul }}
                     </p>
+                @endif
+
+                {{-- Akun resmi desa. Ikonnya diberi garis tepi bayangan yang sama
+                     dengan teksnya supaya tetap kelihatan di atas foto terang. --}}
+                @if ($sosmed !== [])
+                    <div class="mt-[0.32em] flex flex-wrap items-center gap-x-[0.45em] gap-y-[0.12em]">
+                        @foreach ($sosmed as $s)
+                            <span class="flex items-center gap-[0.34em] text-[0.23em] font-bold leading-none text-white [text-shadow:0_0.07em_0.09em_rgb(0_0_0/0.85)]">
+                                <x-dynamic-component
+                                    :component="'ikon.'.$s['ikon']"
+                                    class="size-[1.3em] shrink-0 [filter:drop-shadow(0_0.06em_0.08em_rgb(0_0_0/0.85))]"
+                                />
+                                {{ $s['akun'] }}
+                            </span>
+                        @endforeach
+                    </div>
                 @endif
             </div>
 

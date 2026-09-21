@@ -80,6 +80,35 @@ class KanvasThumbnailTest extends TestCase
         $this->assertStringNotContainsString('judul-hias', $html);
     }
 
+    public function test_akun_resmi_desa_tampil_di_kanvas(): void
+    {
+        config(['warta.sosmed' => [
+            ['ikon' => 'facebook', 'akun' => 'penunggul.id'],
+            ['ikon' => 'instagram', 'akun' => '@penunggul.id'],
+            ['ikon' => 'web', 'akun' => 'penunggul.desa.id'],
+        ]]);
+
+        foreach ([GayaThumbnail::Overlay, GayaThumbnail::PitaTerang] as $gaya) {
+            $html = $this->render(UkuranThumbnail::Facebook, $this->foto(1), $gaya);
+
+            $this->assertStringContainsString('penunggul.id', $html);
+            $this->assertStringContainsString('@penunggul.id', $html);
+            $this->assertStringContainsString('penunggul.desa.id', $html);
+
+            // Ikonnya ikut tergambar, bukan hanya teksnya.
+            $this->assertSame(3, substr_count($html, '<svg'), 'Tiap akun harus punya ikonnya sendiri');
+        }
+    }
+
+    public function test_akun_tanpa_isi_tidak_menyisakan_ikon_yatim(): void
+    {
+        config(['warta.sosmed' => []]);
+
+        $html = $this->render(UkuranThumbnail::Facebook, $this->foto(1));
+
+        $this->assertStringNotContainsString('<svg', $html);
+    }
+
     public function test_foto_melebihi_batas_tidak_ikut_dirender(): void
     {
         $html = $this->render(UkuranThumbnail::Facebook, $this->foto(7));

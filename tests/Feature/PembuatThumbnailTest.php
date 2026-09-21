@@ -38,7 +38,6 @@ class PembuatThumbnailTest extends TestCase
         Livewire::test(PembuatThumbnail::class)
             ->set('judul', 'RSUD Resmikan Gedung Baru')
             ->set('subjudul', 'Melayani 200 pasien per hari')
-            ->set('label', 'BERITA')
             ->call('simpan')
             ->assertHasNoErrors();
 
@@ -118,8 +117,6 @@ class PembuatThumbnailTest extends TestCase
     {
         $thumbnail = Thumbnail::create([
             'judul' => 'Judul tersimpan',
-            'label' => 'SIARAN PERS',
-            'tanggal' => '2026-09-21',
         ]);
 
         $thumbnail->foto()->create([
@@ -131,7 +128,6 @@ class PembuatThumbnailTest extends TestCase
 
         Livewire::test(PembuatThumbnail::class, ['thumbnail' => $thumbnail->fresh()])
             ->assertSet('judul', 'Judul tersimpan')
-            ->assertSet('label', 'SIARAN PERS')
             ->assertSet('foto.0.fokus_x', 30)
             ->assertSet('foto.0.fokus_y', 40);
     }

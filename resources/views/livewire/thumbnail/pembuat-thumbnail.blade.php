@@ -52,24 +52,6 @@
                 @error('subjudul') <p class="{{ $kelasGalat }}">{{ $message }}</p> @enderror
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label for="label" class="{{ $kelasLabel }}">Label</label>
-                    <input
-                        id="label"
-                        type="text"
-                        wire:model.live.debounce.400ms="label"
-                        placeholder="BERITA"
-                        class="{{ $kelasInput }}"
-                    >
-                    @error('label') <p class="{{ $kelasGalat }}">{{ $message }}</p> @enderror
-                </div>
-                <div>
-                    <label for="tanggal" class="{{ $kelasLabel }}">Tanggal</label>
-                    <input id="tanggal" type="date" wire:model.live="tanggal" class="{{ $kelasInput }}">
-                    @error('tanggal') <p class="{{ $kelasGalat }}">{{ $message }}</p> @enderror
-                </div>
-            </div>
         </section>
 
         {{-- ---------- Foto ---------- --}}
@@ -338,8 +320,6 @@
                             :ukuran="$u"
                             :judul="$judul"
                             :subjudul="$subjudul"
-                            :label="$label"
-                            :tanggal="$this->tanggalTampil"
                             :gaya="$this->gayaTerpilih"
                             :model="$this->modelTerpilih"
                             :aksen="$this->aksenTerpilih"

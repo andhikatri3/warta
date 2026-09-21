@@ -16,8 +16,6 @@ class Thumbnail extends Model
     protected $fillable = [
         'judul',
         'subjudul',
-        'label',
-        'tanggal',
         'gaya',
         'model_teks',
         'aksen',
@@ -27,7 +25,6 @@ class Thumbnail extends Model
     protected function casts(): array
     {
         return [
-            'tanggal' => 'date',
             'gaya' => GayaThumbnail::class,
             'model_teks' => ModelTeks::class,
             'aksen' => Aksen::class,
