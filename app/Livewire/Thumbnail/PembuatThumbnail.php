@@ -66,6 +66,12 @@ class PembuatThumbnail extends Component
         $this->tanggal = now()->toDateString();
 
         if (! $thumbnail?->exists) {
+            // Datang dari halaman berita lewat tombol "Buat thumbnail": judulnya
+            // dibawa di kueri supaya tidak perlu disalin tangan. Dipangkas ke
+            // batas yang sama dengan aturan validasi agar judul panjang tidak
+            // langsung menolak formulir yang belum disentuh pemakai.
+            $this->judul = mb_substr(trim((string) request()->query('judul', '')), 0, 160);
+
             return;
         }
 

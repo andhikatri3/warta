@@ -3,12 +3,17 @@
 Alat internal untuk menyusun berita dan thumbnail-nya. Dua fitur:
 
 1. **Thumbnail kolase** — beberapa foto disusun jadi satu gambar, dirender ke
-   tiga ukuran siap bagikan. **Sudah jalan.**
-2. **Generate berita dari 5W+1H** — belum dibangun.
+   tiga ukuran siap bagikan.
+2. **Menulis berita dari 5W+1H** — bahan disusun model Claude menjadi naskah
+   berikut tiga alternatif judul.
+
+Keduanya sudah jalan dan saling tersambung: tombol di halaman berita membuka
+pembuat thumbnail dengan judulnya sudah terisi.
 
 ## Stack
 
-Laravel 13 · Livewire 4 · Tailwind 4 (Vite 8) · Intervention Image 4 · MySQL
+Laravel 13 · Livewire 4 · Tailwind 4 (Vite 8) · Intervention Image 4 ·
+Anthropic PHP SDK · MySQL
 
 Penamaan kelas, berkas, tabel, dan komentar memakai bahasa Indonesia, mengikuti
 pola bimbel-ops (`PembuatThumbnail`, `TataLetakKolase`, tabel `thumbnail_foto`).
@@ -23,6 +28,45 @@ php artisan serve
 ```
 
 Basis data: `warta` (aplikasi) dan `warta_test` (pengujian), MySQL.
+
+Menulis berita butuh `ANTHROPIC_API_KEY` di `.env`. Tanpa kunci, halamannya
+tetap terbuka dan formulirnya tetap bisa diisi — yang muncul pesan yang
+menjelaskan kunci belum diisi, bukan layar galat.
+
+## Menulis berita
+
+Pembagian tugasnya disengaja: **penyusun bertanggung jawab atas kebenaran
+fakta, model hanya atas bentuk kalimat.** Model tidak meliput, tidak mencari
+data, dan tidak tahu apa pun di luar `BahanBerita`. Prompt sistem di
+`PenulisClaude` melarangnya menambah nama, angka, tanggal, tempat, atau
+lembaga yang tidak ada di bahan, dan melarangnya mengarang kutipan.
+
+Dua rinci yang mudah dianggap remeh:
+
+- **Ruas kosong tidak dikirim.** `BahanBerita::sebagaiDaftar()` membuang ruas
+  yang tidak diisi alih-alih mengirim labelnya dengan isi kosong. Label kosong
+  mengundang model mengisinya sendiri.
+- **Kutipan disalin persis.** Kutipan dikirim terpisah dari bahan, dengan
+  perintah menyalin huruf demi huruf; model hanya boleh menambahkan kalimat
+  pengantar.
+
+Naskahnya diminta lewat structured output (`outputConfig.format` dengan skema
+JSON), bukan diurai dari teks bebas. Catatan SDK: `parsedOutput()` hanya
+bekerja untuk kelas `StructuredOutputModel`; dengan skema mentah seperti di
+sini, isinya dibaca dari blok teks pertama lalu `json_decode` sendiri.
+
+Bahan 5W+1H ikut tersimpan di kolom `bahan` bersama naskahnya, jadi asal tiap
+kalimat bisa ditelusuri dan berita bisa ditulis ulang dengan gaya lain tanpa
+mengetik faktanya dari awal.
+
+Penulisnya di balik kontrak `App\Contracts\PenulisBerita`. Pengujian menukarnya
+dengan `Tests\Dukungan\PenulisTiruan` — **rangkaian tes tidak boleh pernah
+memanggil layanan berbayar.** Kalau menambah tes yang menyentuh jalur ini,
+pasang tiruannya lewat `$this->app->instance(...)`.
+
+Model dan kedalaman berpikirnya diatur di `config/anthropic.php`. `effort`
+ditahan di `medium` karena tugasnya mengarang dari fakta yang sudah ada, bukan
+menalar; naikkan kalau hasilnya dangkal.
 
 ## Hal yang mudah salah
 
@@ -159,8 +203,9 @@ php artisan warta:bersihkan-foto --paksa  # untuk cron
 
 ## Yang belum dikerjakan
 
-- Fitur generate berita 5W+1H (`ANTHROPIC_API_KEY` sudah disiapkan di `.env`).
 - Autentikasi — saat ini semua rute terbuka.
+- Jalur penulisan berita belum pernah dijalankan dengan kunci API sungguhan;
+  yang teruji baru jalur di sekitarnya lewat penulis tiruan.
 - Penyusunan ulang foto memakai tombol naik/turun, belum seret-lepas.
 - Judul overlay selalu rata kiri bawah; belum ada pilihan perataan atau pita
   miring seperti poster desa pada umumnya.

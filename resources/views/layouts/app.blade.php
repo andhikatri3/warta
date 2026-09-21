@@ -18,7 +18,7 @@
 <body class="flex h-full flex-col bg-slate-50 text-slate-900 antialiased">
     <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
         <div class="mx-auto flex h-14 max-w-[1600px] items-center gap-6 px-4 sm:px-6">
-            <a href="{{ route('thumbnail.baru') }}" class="flex items-center gap-2 font-bold tracking-tight">
+            <a href="{{ route('berita.baru') }}" class="flex items-center gap-2 font-bold tracking-tight">
                 <span class="grid size-7 place-items-center rounded-lg bg-slate-900 text-xs font-black text-white">W</span>
                 {{ config('app.name') }}
             </a>
@@ -26,8 +26,10 @@
             <nav class="flex items-center gap-1 text-sm font-medium">
                 @php
                     $tautan = [
+                        ['rute' => 'berita.baru', 'teks' => 'Tulis berita'],
                         ['rute' => 'thumbnail.baru', 'teks' => 'Thumbnail'],
-                        ['rute' => 'thumbnail.riwayat', 'teks' => 'Riwayat'],
+                        ['rute' => 'berita.riwayat', 'teks' => 'Arsip berita'],
+                        ['rute' => 'thumbnail.riwayat', 'teks' => 'Arsip thumbnail'],
                     ];
                 @endphp
                 @foreach ($tautan as $t)
