@@ -102,7 +102,7 @@ ternajis dan **seluruh** penangkapan gagal. Jangan dikembalikan ke absolut.
 
 Pratinjau memakai `transform: scale()`. `modern-screenshot` menyalin gaya
 terhitung ke klonanya, jadi tanpa `style: { transform: 'none' }` pada opsi
-`domToBlob`, berkas 1200x630 hanya berisi gambar kecil di pojok kiri atas.
+`domToCanvas`, berkas 1200x630 hanya berisi gambar kecil di pojok kiri atas.
 Lihat `resources/js/app.js`.
 
 ### 4. Intervention Image 4.3 memakai `decodePath()`, bukan `read()`
