@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\Aksen;
-use App\Enums\GayaThumbnail;
 use App\Enums\ModelTeks;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,7 +15,6 @@ class Thumbnail extends Model
     protected $fillable = [
         'judul',
         'subjudul',
-        'gaya',
         'model_teks',
         'aksen',
         'logo',
@@ -25,7 +23,6 @@ class Thumbnail extends Model
     protected function casts(): array
     {
         return [
-            'gaya' => GayaThumbnail::class,
             'model_teks' => ModelTeks::class,
             'aksen' => Aksen::class,
         ];

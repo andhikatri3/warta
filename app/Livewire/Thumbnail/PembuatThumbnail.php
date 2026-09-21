@@ -3,7 +3,6 @@
 namespace App\Livewire\Thumbnail;
 
 use App\Enums\Aksen;
-use App\Enums\GayaThumbnail;
 use App\Enums\ModelTeks;
 use App\Enums\UkuranThumbnail;
 use App\Models\Thumbnail;
@@ -25,8 +24,6 @@ class PembuatThumbnail extends Component
     public string $judul = '';
 
     public ?string $subjudul = null;
-
-    public string $gaya = GayaThumbnail::Overlay->value;
 
     public string $model = ModelTeks::Ceria->value;
 
@@ -71,7 +68,6 @@ class PembuatThumbnail extends Component
         $this->thumbnailId = $thumbnail->id;
         $this->judul = $thumbnail->judul;
         $this->subjudul = $thumbnail->subjudul;
-        $this->gaya = $thumbnail->gaya->value;
         $this->model = $thumbnail->model_teks->value;
         $this->aksen = $thumbnail->aksen->value;
         $this->logoPath = $thumbnail->logo;
@@ -90,7 +86,6 @@ class PembuatThumbnail extends Component
         return [
             'judul' => ['required', 'string', 'max:160'],
             'subjudul' => ['nullable', 'string', 'max:200'],
-            'gaya' => ['required', 'string'],
             'model' => ['required', 'string'],
             'aksen' => ['required', 'string'],
         ];
@@ -221,7 +216,6 @@ class PembuatThumbnail extends Component
         $thumbnail->fill([
             'judul' => $this->judul,
             'subjudul' => $this->subjudul,
-            'gaya' => $this->gaya,
             'model_teks' => $this->model,
             'aksen' => $this->aksen,
             'logo' => $this->logoPath,
@@ -247,12 +241,6 @@ class PembuatThumbnail extends Component
         $this->thumbnailId = $thumbnail->id;
 
         session()->flash('sukses', 'Thumbnail tersimpan.');
-    }
-
-    #[Computed]
-    public function gayaTerpilih(): GayaThumbnail
-    {
-        return GayaThumbnail::tryFrom($this->gaya) ?? GayaThumbnail::Overlay;
     }
 
     #[Computed]

@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\GayaThumbnail;
 use App\Enums\UkuranThumbnail;
 use App\Support\TataLetakKolase;
 use Illuminate\Support\Facades\Blade;
@@ -18,11 +17,11 @@ class KanvasThumbnailTest extends TestCase
             ->all();
     }
 
-    private function render(UkuranThumbnail $ukuran, array $foto, ?GayaThumbnail $gaya = null): string
+    private function render(UkuranThumbnail $ukuran, array $foto): string
     {
         return Blade::render(
-            '<x-kanvas-thumbnail :ukuran="$ukuran" :foto="$foto" :gaya="$gaya" judul="Judul percobaan" />',
-            ['ukuran' => $ukuran, 'foto' => $foto, 'gaya' => $gaya],
+            '<x-kanvas-thumbnail :ukuran="$ukuran" :foto="$foto" judul="Judul percobaan" />',
+            ['ukuran' => $ukuran, 'foto' => $foto],
         );
     }
 
@@ -39,15 +38,13 @@ class KanvasThumbnailTest extends TestCase
         }
     }
 
-    public function test_overlay_dipertahankan_walau_fotonya_kolase(): void
+    public function test_judul_selalu_menumpuk_foto(): void
     {
-        $satu = $this->render(UkuranThumbnail::Facebook, $this->foto(1), GayaThumbnail::Overlay);
-        $banyak = $this->render(UkuranThumbnail::Facebook, $this->foto(3), GayaThumbnail::Overlay);
+        // Tidak ada lagi varian pita: judul ditumpuk di atas kolase berapa pun
+        // jumlah fotonya, dan yang membuatnya terbaca adalah garis tepi huruf.
+        foreach ([1, 3] as $jumlah) {
+            $html = $this->render(UkuranThumbnail::Facebook, $this->foto($jumlah));
 
-        // Gradien dan kelas hiasan hanya ada pada cabang overlay. Dulu overlay
-        // diturunkan paksa ke pita begitu fotonya lebih dari satu; sekarang
-        // tidak lagi, karena judul bergaris tepi tetap terbaca di atas kolase.
-        foreach ([$satu, $banyak] as $html) {
             $this->assertStringContainsString('linear-gradient', $html);
             $this->assertStringContainsString('judul-hias', $html);
         }
@@ -69,17 +66,6 @@ class KanvasThumbnailTest extends TestCase
         $this->assertStringContainsString('--aksen: #dc2626;', $html);
     }
 
-    public function test_pita_memakai_huruf_model_tanpa_hiasannya(): void
-    {
-        $html = $this->render(UkuranThumbnail::Facebook, $this->foto(1), GayaThumbnail::PitaTerang);
-
-        // Hurufnya ikut model, tetapi garis tepi tidak boleh masuk ke pita:
-        // aturan warnanya akan mengalahkan kelas Tailwind dan judul putih
-        // mendarat di atas pita putih.
-        $this->assertStringContainsString('judul-kanvas', $html);
-        $this->assertStringNotContainsString('judul-hias', $html);
-    }
-
     public function test_akun_resmi_desa_tampil_di_kanvas(): void
     {
         config(['warta.sosmed' => [
@@ -88,16 +74,14 @@ class KanvasThumbnailTest extends TestCase
             ['ikon' => 'web', 'akun' => 'penunggul.desa.id'],
         ]]);
 
-        foreach ([GayaThumbnail::Overlay, GayaThumbnail::PitaTerang] as $gaya) {
-            $html = $this->render(UkuranThumbnail::Facebook, $this->foto(1), $gaya);
+        $html = $this->render(UkuranThumbnail::Facebook, $this->foto(1));
 
-            $this->assertStringContainsString('penunggul.id', $html);
-            $this->assertStringContainsString('@penunggul.id', $html);
-            $this->assertStringContainsString('penunggul.desa.id', $html);
+        $this->assertStringContainsString('penunggul.id', $html);
+        $this->assertStringContainsString('@penunggul.id', $html);
+        $this->assertStringContainsString('penunggul.desa.id', $html);
 
-            // Ikonnya ikut tergambar, bukan hanya teksnya.
-            $this->assertSame(3, substr_count($html, '<svg'), 'Tiap akun harus punya ikonnya sendiri');
-        }
+        // Ikonnya ikut tergambar, bukan hanya teksnya.
+        $this->assertSame(3, substr_count($html, '<svg'), 'Tiap akun harus punya ikonnya sendiri');
     }
 
     public function test_akun_tanpa_isi_tidak_menyisakan_ikon_yatim(): void
@@ -107,6 +91,39 @@ class KanvasThumbnailTest extends TestCase
         $html = $this->render(UkuranThumbnail::Facebook, $this->foto(1));
 
         $this->assertStringNotContainsString('<svg', $html);
+    }
+
+    /**
+     * Aksen pernah diam-diam menjadi hiasan tanpa fungsi.
+     *
+     * Saat lencana label dibuang dari kanvas, satu-satunya sisa pemakai aksen
+     * adalah garis tepi huruf model Ceria — jadi pada tiga model lainnya
+     * memilih warna tidak mengubah apa pun, tanpa galat dan tanpa tanda.
+     * Tes ini memastikan tiap model punya sesuatu yang benar-benar berubah.
+     */
+    public function test_aksen_mengubah_kanvas_pada_semua_model_teks(): void
+    {
+        foreach (\App\Enums\ModelTeks::cases() as $model) {
+            $merah = $this->renderPenuh($model, \App\Enums\Aksen::Merah);
+            $hijau = $this->renderPenuh($model, \App\Enums\Aksen::Hijau);
+
+            $this->assertNotSame(
+                $merah,
+                $hijau,
+                "Mengganti aksen tidak mengubah apa pun pada model {$model->value}",
+            );
+
+            $this->assertStringContainsString('#dc2626', $merah);
+            $this->assertStringContainsString('#059669', $hijau);
+        }
+    }
+
+    private function renderPenuh(\App\Enums\ModelTeks $model, \App\Enums\Aksen $aksen): string
+    {
+        return Blade::render(
+            '<x-kanvas-thumbnail :ukuran="$u" :foto="$f" :model="$m" :aksen="$a" judul="Halo" subjudul="Sub" />',
+            ['u' => UkuranThumbnail::Facebook, 'f' => $this->foto(1), 'm' => $model, 'a' => $aksen],
+        );
     }
 
     public function test_foto_melebihi_batas_tidak_ikut_dirender(): void

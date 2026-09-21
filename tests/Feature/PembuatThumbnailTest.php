@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\GayaThumbnail;
 use App\Livewire\Thumbnail\PembuatThumbnail;
 use App\Models\Thumbnail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -82,20 +81,6 @@ class PembuatThumbnailTest extends TestCase
             ->call('aturFokus', 0, -30, 480)
             ->assertSet('foto.0.fokus_x', 0)
             ->assertSet('foto.0.fokus_y', 100);
-    }
-
-    public function test_overlay_adalah_bawaan_dan_bertahan_saat_fotonya_kolase(): void
-    {
-        $komponen = Livewire::test(PembuatThumbnail::class);
-
-        $this->assertSame(GayaThumbnail::Overlay, $komponen->instance()->gayaTerpilih);
-
-        $komponen->set('foto', [
-            ['path' => 'a.jpg', 'url' => '/storage/a.jpg', 'fokus_x' => 50, 'fokus_y' => 50],
-            ['path' => 'b.jpg', 'url' => '/storage/b.jpg', 'fokus_x' => 50, 'fokus_y' => 50],
-        ]);
-
-        $this->assertSame(GayaThumbnail::Overlay, $komponen->instance()->gayaTerpilih);
     }
 
     public function test_model_teks_ikut_tersimpan_dan_termuat_kembali(): void

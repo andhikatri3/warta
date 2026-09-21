@@ -41,7 +41,6 @@
                             :ukuran="UkuranThumbnail::Facebook"
                             :judul="$item->judul"
                             :subjudul="$item->subjudul"
-                            :gaya="$item->gaya"
                             :model="$item->model_teks"
                             :aksen="$item->aksen"
                             :logo="$item->logoUrl()"

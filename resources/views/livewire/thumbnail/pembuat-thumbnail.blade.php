@@ -1,6 +1,5 @@
 @php
     use App\Enums\Aksen;
-    use App\Enums\GayaThumbnail;
     use App\Enums\ModelTeks;
     use App\Support\TataLetakKolase;
 
@@ -200,31 +199,6 @@
                 </p>
             </div>
 
-            <div class="mb-4">
-                <span class="{{ $kelasLabel }}">Letak judul</span>
-                <div class="grid grid-cols-3 gap-1.5">
-                    @foreach (GayaThumbnail::cases() as $g)
-                        <button
-                            type="button"
-                            wire:click="$set('gaya', '{{ $g->value }}')"
-                            title="{{ $g->keterangan() }}"
-                            @class([
-                                'rounded-lg border px-2 py-2 text-left transition',
-                                'border-slate-900 bg-slate-900 text-white' => $this->gayaTerpilih === $g,
-                                'border-slate-200 text-slate-700 hover:border-slate-400' => $this->gayaTerpilih !== $g,
-                            ])
-                        >
-                            <span class="block text-[11px] font-bold leading-tight">{{ $g->label() }}</span>
-                            <span @class([
-                                'mt-0.5 block text-[10px] leading-tight',
-                                'text-slate-300' => $this->gayaTerpilih === $g,
-                                'text-slate-400' => $this->gayaTerpilih !== $g,
-                            ])>{{ $g->keterangan() }}</span>
-                        </button>
-                    @endforeach
-                </div>
-            </div>
-
             <div>
                 <span class="{{ $kelasLabel }}">Aksen</span>
                 <div class="flex gap-2">
@@ -320,7 +294,6 @@
                             :ukuran="$u"
                             :judul="$judul"
                             :subjudul="$subjudul"
-                            :gaya="$this->gayaTerpilih"
                             :model="$this->modelTerpilih"
                             :aksen="$this->aksenTerpilih"
                             :logo="$logoUrl"

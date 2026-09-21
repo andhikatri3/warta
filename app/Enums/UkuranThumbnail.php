@@ -5,10 +5,6 @@ namespace App\Enums;
 /**
  * Ukuran keluaran thumbnail.
  *
- * Tiap ukuran membawa tinggi pita teksnya sendiri, bukan satu nilai yang
- * dibagi bersama, karena proporsi pita yang enak dilihat di tautan Facebook
- * yang lebar terlihat terlalu tipis saat dipakai di Story yang jangkung.
- *
  * `basis` adalah font-size yang dipasang pada elemen kanvas. Seluruh ukuran
  * teks, jarak, dan padding di dalam kanvas ditulis dalam satuan em terhadap
  * nilai ini, jadi satu templat Blade bisa melayani ketiga ukuran tanpa
@@ -34,24 +30,6 @@ enum UkuranThumbnail: string
             self::Facebook => 630,
             self::Persegi => 1080,
             self::Story => 1920,
-        };
-    }
-
-    /**
-     * Tinggi pita teks.
-     *
-     * Angkanya bukan selera, melainkan hasil menjumlahkan isi terburuk yang
-     * masih boleh muat: baris label, judul sepenuh batas barisnya, subjudul,
-     * jarak antarunsur, dan padding atas-bawah. Nilai Facebook yang pertama
-     * dipakai (172) ternyata kurang belasan piksel, dan kekurangan itu tidak
-     * terlihat di pratinjau kecil — yang tampak hanya subjudul yang hilang
-     * separuh di tepi bawah berkas jadinya.
-     */
-    public function tinggiPita(): int
-    {
-        return match ($this) {
-            self::Facebook, self::Persegi => 210,
-            self::Story => 330,
         };
     }
 
@@ -92,7 +70,7 @@ enum UkuranThumbnail: string
     }
 
     /**
-     * Pemangkas jumlah baris judul agar tidak meluber dari pita.
+     * Pemangkas jumlah baris judul agar tidak meluber dari kanvas.
      *
      * Luapan di kanvas berukuran tetap tidak memunculkan bilah gulir — ia
      * hanya terpotong diam-diam di tempat yang tidak terduga saat dijadikan
@@ -112,10 +90,9 @@ enum UkuranThumbnail: string
     }
 
     /**
-     * Subjudul dipangkas lebih ketat daripada judul, dan paling ketat di
-     * kanvas yang pitanya paling sempit: ia yang mengalah kalau ruang habis,
-     * karena judul yang terpenggal jauh lebih merusak daripada subjudul yang
-     * terpenggal.
+     * Subjudul dipangkas lebih ketat daripada judul: ia yang mengalah kalau
+     * ruang habis, karena judul yang terpenggal jauh lebih merusak daripada
+     * subjudul yang terpenggal.
      */
     public function klemSubjudul(): string
     {
@@ -126,12 +103,15 @@ enum UkuranThumbnail: string
     }
 
     /**
-     * Bentuk area kolase setelah pita teks dipotong. Inilah yang menentukan
-     * arah susunan foto — lihat TataLetakKolase.
+     * Bentuk kanvas. Inilah yang menentukan arah susunan foto — lihat
+     * TataLetakKolase.
+     *
+     * Dihitung dari kanvas penuh karena kolase mengisi seluruhnya: judul
+     * ditumpuk di atas foto, tidak lagi memotong ruang untuk pita sendiri.
      */
     public function bentuk(): BentukKolase
     {
-        $rasio = $this->lebar() / ($this->tinggi() - $this->tinggiPita());
+        $rasio = $this->lebar() / $this->tinggi();
 
         return match (true) {
             $rasio >= 1.3 => BentukKolase::Lebar,

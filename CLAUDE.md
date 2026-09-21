@@ -166,14 +166,20 @@ biasa, bukan utility, karena `-webkit-text-stroke`, `paint-order`, dan gradien
 yang dipotong bentuk huruf memang tidak punya utility-nya.
 
 Dua kelas dipisah dengan sengaja: `.judul-kanvas` hanya membawa hurufnya,
-`.judul-hias` membawa garis tepi dan gradien. Hiasan hanya dipasang pada varian
-overlay — kalau digabung, aturan warnanya yang lebih spesifik akan mengalahkan
-kelas Tailwind pada varian pita dan judul putih mendarat di atas pita putih.
+`.judul-hias` membawa garis tepi dan gradien. Pemisahan itu sisa dari masa
+ketika ada varian pita berlatar putih, dan tetap dipertahankan karena berguna:
+huruf dan hiasan memang dua hal berbeda.
 
-Garis tepi tebal itu yang membuat Overlay boleh menjadi bawaan. Sebelum ada
-model teks, judul polos di atas kolase bisa jatuh tepat di atas wajah, jadi
-overlay diturunkan paksa ke pita begitu fotonya lebih dari satu. Penjagaan itu
-sudah dicabut.
+Garis tepi tebal itu yang membuat judul boleh ditumpuk di atas kolase sebagai
+satu-satunya tata letak. Tanpa hiasan ini, judul polos bisa mendarat tepat di
+atas wajah dan varian pita terpisah jadi perlu.
+
+**Aksen harus punya pekerjaan yang terlihat.** Ia pernah diam-diam jadi hiasan
+tanpa fungsi: waktu lencana label dibuang, satu-satunya sisa pemakainya adalah
+garis tepi huruf model Ceria, jadi pada tiga model lain memilih warna tidak
+mengubah apa pun. Sekarang aksen mewarnai palang di atas judul dan ikon akun —
+keduanya ada di semua model — dan ada tes regresi yang membandingkan hasil
+render dua aksen berbeda untuk tiap model.
 
 ## Satuan di dalam kanvas
 
@@ -185,11 +191,10 @@ Awas penggandaan: `em` pada elemen yang juga menyetel `text-[Xem]` dihitung
 terhadap font-size elemen itu sendiri, bukan terhadap kanvas. Jangan
 menyarangkan `text-[...]` di dalam `text-[...]`.
 
-`tinggiPita()` bukan selera: angkanya hasil menjumlahkan isi terburuk yang masih
-boleh muat — judul sepenuh batas barisnya, subjudul, baris akun, dan padding.
-Kalau salah satunya diperbesar, hitung ulang; kekurangan belasan piksel tidak
-terlihat di pratinjau kecil, yang tampak hanya subjudul yang hilang separuh di
-berkas jadinya.
+Blok teks duduk di dasar kanvas dan tumbuh ke atas, jadi tidak ada tinggi tetap
+yang harus dihitung ulang. Yang menjaganya tetap terkendali adalah `klemJudul()`
+dan `klemSubjudul()`: luapan di kanvas berukuran tetap tidak memunculkan bilah
+gulir, ia hanya terpotong diam-diam di tempat yang tidak terduga.
 
 ## Akun resmi di kanvas
 
@@ -226,5 +231,5 @@ php artisan warta:bersihkan-foto --paksa  # untuk cron
 - Jalur penulisan berita belum pernah dijalankan dengan kunci API sungguhan;
   yang teruji baru jalur di sekitarnya lewat penulis tiruan.
 - Penyusunan ulang foto memakai tombol naik/turun, belum seret-lepas.
-- Judul overlay selalu rata kiri bawah; belum ada pilihan perataan atau pita
-  miring seperti poster desa pada umumnya.
+- Judul selalu rata kiri bawah; belum ada pilihan perataan atau pita miring
+  seperti poster desa pada umumnya.
