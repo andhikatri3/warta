@@ -6,11 +6,12 @@ namespace App\Enums;
  * Varian desain thumbnail.
  *
  * Pita menaruh judul di bidang solid di bawah kolase; Overlay menumpuknya di
- * atas foto dengan gradien. Overlay hanya rapi kalau fotonya satu dan bagian
- * bawahnya lapang — di kolase, sudut tempat judul jatuh berbeda-beda tiap
- * gambar dan judul bisa mendarat tepat di atas wajah atau bidang terang.
- * Karena itu Overlay ditandai tidak cocok untuk kolase, dan pemilihnya
- * dinonaktifkan begitu foto lebih dari satu.
+ * atas foto. Overlay adalah bawaannya.
+ *
+ * Dulu Overlay diturunkan paksa ke Pita begitu fotonya lebih dari satu, karena
+ * judul polos bisa mendarat tepat di atas wajah atau bidang terang. Penjagaan
+ * itu dicabut setelah ada ModelTeks: judul bergaris tepi tebal terbaca di atas
+ * foto apa pun, dan justru itulah cara desain poster desa menaruh teksnya.
  */
 enum GayaThumbnail: string
 {
@@ -39,10 +40,5 @@ enum GayaThumbnail: string
     public function berpita(): bool
     {
         return $this !== self::Overlay;
-    }
-
-    public function cocokUntukKolase(): bool
-    {
-        return $this->berpita();
     }
 }

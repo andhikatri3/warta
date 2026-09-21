@@ -85,16 +85,33 @@ class PembuatThumbnailTest extends TestCase
             ->assertSet('foto.0.fokus_y', 100);
     }
 
-    public function test_gaya_overlay_diturunkan_saat_fotonya_kolase(): void
+    public function test_overlay_adalah_bawaan_dan_bertahan_saat_fotonya_kolase(): void
     {
-        $komponen = Livewire::test(PembuatThumbnail::class)
-            ->set('gaya', GayaThumbnail::Overlay->value)
-            ->set('foto', [
-                ['path' => 'a.jpg', 'url' => '/storage/a.jpg', 'fokus_x' => 50, 'fokus_y' => 50],
-                ['path' => 'b.jpg', 'url' => '/storage/b.jpg', 'fokus_x' => 50, 'fokus_y' => 50],
-            ]);
+        $komponen = Livewire::test(PembuatThumbnail::class);
 
-        $this->assertSame(GayaThumbnail::PitaTerang, $komponen->instance()->gayaTerpilih);
+        $this->assertSame(GayaThumbnail::Overlay, $komponen->instance()->gayaTerpilih);
+
+        $komponen->set('foto', [
+            ['path' => 'a.jpg', 'url' => '/storage/a.jpg', 'fokus_x' => 50, 'fokus_y' => 50],
+            ['path' => 'b.jpg', 'url' => '/storage/b.jpg', 'fokus_x' => 50, 'fokus_y' => 50],
+        ]);
+
+        $this->assertSame(GayaThumbnail::Overlay, $komponen->instance()->gayaTerpilih);
+    }
+
+    public function test_model_teks_ikut_tersimpan_dan_termuat_kembali(): void
+    {
+        Livewire::test(PembuatThumbnail::class)
+            ->set('judul', 'Pengajian Akbar')
+            ->set('model', \App\Enums\ModelTeks::Agung->value)
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $tersimpan = Thumbnail::firstOrFail();
+        $this->assertSame(\App\Enums\ModelTeks::Agung, $tersimpan->model_teks);
+
+        Livewire::test(PembuatThumbnail::class, ['thumbnail' => $tersimpan])
+            ->assertSet('model', 'agung');
     }
 
     public function test_menyunting_thumbnail_tersimpan_memuat_isinya(): void

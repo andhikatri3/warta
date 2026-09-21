@@ -39,14 +39,45 @@ class KanvasThumbnailTest extends TestCase
         }
     }
 
-    public function test_overlay_turun_ke_pita_begitu_fotonya_lebih_dari_satu(): void
+    public function test_overlay_dipertahankan_walau_fotonya_kolase(): void
     {
         $satu = $this->render(UkuranThumbnail::Facebook, $this->foto(1), GayaThumbnail::Overlay);
         $banyak = $this->render(UkuranThumbnail::Facebook, $this->foto(3), GayaThumbnail::Overlay);
 
-        // Gradien hanya ada pada cabang overlay.
-        $this->assertStringContainsString('linear-gradient', $satu);
-        $this->assertStringNotContainsString('linear-gradient', $banyak);
+        // Gradien dan kelas hiasan hanya ada pada cabang overlay. Dulu overlay
+        // diturunkan paksa ke pita begitu fotonya lebih dari satu; sekarang
+        // tidak lagi, karena judul bergaris tepi tetap terbaca di atas kolase.
+        foreach ([$satu, $banyak] as $html) {
+            $this->assertStringContainsString('linear-gradient', $html);
+            $this->assertStringContainsString('judul-hias', $html);
+        }
+    }
+
+    public function test_model_teks_menentukan_atribut_kanvas_dan_warna_aksen(): void
+    {
+        $html = Blade::render(
+            '<x-kanvas-thumbnail :ukuran="$u" :foto="$f" :model="$m" :aksen="$a" judul="Halo" />',
+            [
+                'u' => UkuranThumbnail::Facebook,
+                'f' => $this->foto(1),
+                'm' => \App\Enums\ModelTeks::Agung,
+                'a' => \App\Enums\Aksen::Merah,
+            ],
+        );
+
+        $this->assertStringContainsString('data-model="agung"', $html);
+        $this->assertStringContainsString('--aksen: #dc2626;', $html);
+    }
+
+    public function test_pita_memakai_huruf_model_tanpa_hiasannya(): void
+    {
+        $html = $this->render(UkuranThumbnail::Facebook, $this->foto(1), GayaThumbnail::PitaTerang);
+
+        // Hurufnya ikut model, tetapi garis tepi tidak boleh masuk ke pita:
+        // aturan warnanya akan mengalahkan kelas Tailwind dan judul putih
+        // mendarat di atas pita putih.
+        $this->assertStringContainsString('judul-kanvas', $html);
+        $this->assertStringNotContainsString('judul-hias', $html);
     }
 
     public function test_foto_melebihi_batas_tidak_ikut_dirender(): void

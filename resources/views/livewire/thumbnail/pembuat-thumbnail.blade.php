@@ -1,6 +1,7 @@
 @php
     use App\Enums\Aksen;
     use App\Enums\GayaThumbnail;
+    use App\Enums\ModelTeks;
     use App\Support\TataLetakKolase;
 
     $kelasLabel = 'mb-1.5 block text-xs font-semibold text-slate-700';
@@ -187,20 +188,48 @@
             <h2 class="mb-3 text-sm font-bold text-slate-900">Tampilan</h2>
 
             <div class="mb-4">
-                <span class="{{ $kelasLabel }}">Varian</span>
+                <span class="{{ $kelasLabel }}">Model teks</span>
+                <div class="grid grid-cols-4 gap-1.5">
+                    @foreach (ModelTeks::cases() as $m)
+                        <button
+                            type="button"
+                            wire:click="$set('model', '{{ $m->value }}')"
+                            title="{{ $m->keterangan() }} — cocok untuk {{ $m->cocokUntuk() }}"
+                            data-model="{{ $m->value }}"
+                            style="--aksen: {{ $this->aksenTerpilih->heks() }};"
+                            @class([
+                                'rounded-lg border bg-white p-1.5 transition',
+                                'border-slate-900 ring-2 ring-slate-900/15' => $this->modelTerpilih === $m,
+                                'border-slate-200 hover:border-slate-400' => $this->modelTerpilih !== $m,
+                            ])
+                        >
+                            {{-- Contohnya diletakkan di atas bidang gelap, meniru
+                                 keadaan sebenarnya: model teks ini memang dipakai
+                                 menumpuk foto, bukan di atas kertas putih. --}}
+                            <span class="grid h-9 place-items-center rounded-md bg-slate-700">
+                                <span class="judul-kanvas judul-hias text-[20px] leading-none">{{ $m->contoh() }}</span>
+                            </span>
+                            <span class="mt-1.5 block text-[10px] font-bold leading-tight text-slate-600">{{ $m->label() }}</span>
+                        </button>
+                    @endforeach
+                </div>
+                <p class="mt-1.5 text-[11px] leading-snug text-slate-400">
+                    {{ $this->modelTerpilih->keterangan() }} — cocok untuk {{ $this->modelTerpilih->cocokUntuk() }}.
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <span class="{{ $kelasLabel }}">Letak judul</span>
                 <div class="grid grid-cols-3 gap-1.5">
                     @foreach (GayaThumbnail::cases() as $g)
-                        @php $nonaktif = $jumlahFoto > 1 && ! $g->cocokUntukKolase(); @endphp
                         <button
                             type="button"
                             wire:click="$set('gaya', '{{ $g->value }}')"
-                            @disabled($nonaktif)
-                            title="{{ $nonaktif ? 'Overlay hanya untuk satu foto' : $g->keterangan() }}"
+                            title="{{ $g->keterangan() }}"
                             @class([
                                 'rounded-lg border px-2 py-2 text-left transition',
                                 'border-slate-900 bg-slate-900 text-white' => $this->gayaTerpilih === $g,
-                                'border-slate-200 text-slate-700 hover:border-slate-400' => $this->gayaTerpilih !== $g && ! $nonaktif,
-                                'cursor-not-allowed border-slate-100 text-slate-300' => $nonaktif,
+                                'border-slate-200 text-slate-700 hover:border-slate-400' => $this->gayaTerpilih !== $g,
                             ])
                         >
                             <span class="block text-[11px] font-bold leading-tight">{{ $g->label() }}</span>
@@ -212,12 +241,6 @@
                         </button>
                     @endforeach
                 </div>
-                @if ($jumlahFoto > 1)
-                    <p class="mt-1.5 text-[11px] leading-snug text-slate-400">
-                        Overlay dimatikan karena fotonya lebih dari satu — judul di atas kolase bisa jatuh
-                        tepat pada wajah atau bidang terang.
-                    </p>
-                @endif
             </div>
 
             <div>
@@ -318,6 +341,7 @@
                             :label="$label"
                             :tanggal="$this->tanggalTampil"
                             :gaya="$this->gayaTerpilih"
+                            :model="$this->modelTerpilih"
                             :aksen="$this->aksenTerpilih"
                             :logo="$logoUrl"
                             :foto="$foto"

@@ -17,6 +17,88 @@
 }
 
 /*
+ * ---------------------------------------------------------------------------
+ * Model teks judul
+ * ---------------------------------------------------------------------------
+ *
+ * Ditulis sebagai CSS biasa, bukan utility Tailwind, karena tiga hal yang
+ * dipakai di sini memang tidak punya utility-nya: -webkit-text-stroke,
+ * paint-order, dan gradien yang dipotong mengikuti bentuk huruf. Menuliskannya
+ * sebagai nilai arbitrer akan berulang di enam tempat dan tidak terbaca.
+ *
+ * Semua ukuran memakai em, jadi ketebalan garis tepi dan jarak bayangan ikut
+ * menyesuaikan sendiri antara kanvas Facebook dan Story tanpa dihitung ulang.
+ *
+ * paint-order: stroke fill penting. Tanpa itu garis tepi digambar di tengah
+ * kontur huruf sehingga separuhnya memakan badan huruf dan bentuknya menciut;
+ * dengan itu, garis tepi jatuh di belakang isian.
+ */
+/*
+ * .judul-kanvas hanya membawa hurufnya; .judul-hias yang membawa garis tepi,
+ * bayangan, dan gradien. Keduanya dipisah karena hiasan itu hanya masuk akal
+ * di atas foto. Kalau digabung, aturan warnanya yang lebih spesifik akan
+ * mengalahkan kelas Tailwind pada varian pita — dan judul putih mendarat di
+ * atas pita putih.
+ */
+.judul-kanvas {
+    font-family: var(--font-judul, var(--font-sans));
+    font-weight: var(--bobot-judul, 800);
+    paint-order: stroke fill;
+}
+
+[data-model='ceria'] {
+    --font-judul: 'Fredoka', var(--font-sans);
+    --bobot-judul: 700;
+}
+[data-model='ceria'] .judul-hias {
+    color: #fff;
+    -webkit-text-stroke: 0.062em var(--aksen, #2563eb);
+    text-shadow: 0 0.055em 0.05em rgb(0 0 0 / 0.38);
+    letter-spacing: -0.005em;
+}
+
+[data-model='tegas'] {
+    --font-judul: 'Anton', var(--font-sans);
+    --bobot-judul: 400;
+}
+[data-model='tegas'] .judul-hias {
+    color: #fff;
+    text-transform: uppercase;
+    -webkit-text-stroke: 0.05em rgb(9 9 14 / 0.92);
+    text-shadow: 0 0.05em 0.045em rgb(0 0 0 / 0.5);
+    letter-spacing: 0.004em;
+}
+
+[data-model='agung'] {
+    --font-judul: 'Playfair Display', Georgia, serif;
+    --bobot-judul: 900;
+}
+[data-model='agung'] .judul-hias {
+    background: linear-gradient(
+        180deg,
+        #fff6cf 0%,
+        #f6d878 34%,
+        #d9a23c 58%,
+        #f9e6a4 82%,
+        #c98f2c 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-stroke: 0.036em rgb(48 28 4 / 0.92);
+    filter: drop-shadow(0 0.035em 0.045em rgb(0 0 0 / 0.55));
+}
+
+[data-model='bersih'] {
+    --font-judul: var(--font-sans);
+    --bobot-judul: 800;
+}
+[data-model='bersih'] .judul-hias {
+    color: #fff;
+    text-shadow: 0 0.05em 0.07em rgb(0 0 0 / 0.7);
+}
+
+/*
  * Kanvas thumbnail selalu dirender pada ukuran piksel sebenarnya supaya hasil
  * tangkapannya tepat, lalu dikecilkan hanya untuk dilihat. Skalanya dihitung
  * di JavaScript dari lebar wadahnya, karena lebar itu ditentukan tata letak

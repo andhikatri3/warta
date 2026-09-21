@@ -5,6 +5,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'Warta' }} &middot; {{ config('app.name') }}</title>
+
+    {{-- Huruf yang dibangun laravel-vite-plugin keluar sebagai berkas CSS
+         tersendiri yang tidak dirujuk app.css, jadi tanpa baris ini tidak ada
+         satu pun webfont yang termuat — halaman diam-diam jatuh ke huruf
+         sistem, dan kanvas thumbnail ikut terbawa. --}}
+    {{ Vite::fonts() }}
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 

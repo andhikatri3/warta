@@ -26,7 +26,7 @@ Basis data: `warta` (aplikasi) dan `warta_test` (pengujian), MySQL.
 
 ## Hal yang mudah salah
 
-Lima hal berikut sudah pernah menggigit saat pembangunan. Semuanya gagal
+Tujuh hal berikut sudah pernah menggigit saat pembangunan. Semuanya gagal
 diam-diam — tanpa galat, tanpa layar merah.
 
 ### 1. Nama kelas Tailwind tidak boleh dirangkai dari potongan
@@ -72,7 +72,28 @@ Karena itu `PenyimpanFotoTest` mengunggah berkas gambar sungguhan, bukan tiruan.
 Apa pun yang menyentuh pustaka gambar harus dilalui tes yang benar-benar
 menghasilkan berkas — membaca tanda tangan metodenya saja tidak cukup.
 
-### 5. Pengujian wajib MySQL
+### 5. Webfont butuh `Vite::fonts()` di layout
+
+`laravel-vite-plugin` membangun huruf menjadi berkas CSS tersendiri yang tidak
+dirujuk `app.css`. Tanpa `{{ Vite::fonts() }}` di `<head>`, tidak ada satu pun
+webfont yang termuat — halaman diam-diam jatuh ke huruf sistem dan semua model
+teks tampak seragam. Gejalanya halus: halamannya tetap tampak wajar, hanya
+hurufnya bukan yang dimaksud. Periksa dengan melihat `document.fonts`, bukan
+dengan mata.
+
+### 6. Pembaruan Livewire menghapus atribut style yang ditulis JavaScript
+
+Livewire mencocokkan DOM ke HTML kiriman server, termasuk atribut `style`. Nilai
+`--skala` yang dipasang `app.js` pada wadah pratinjau ikut terhapus setiap kali
+pemakai mengetik judul, dan kanvas kembali ke ukuran asli lalu tampak terpotong.
+`ResizeObserver` tidak menyelamatkannya karena lebar wadah tidak berubah.
+
+Karena itu `pasangPratinjau()` menghitung skala **langsung**, dan pengamat DOM
+di bawahnya mengawasi `attributes: ['style']`, bukan hanya `childList`.
+Penjaganya ada di `hitungSkala()`: nilai yang sudah sama tidak ditulis ulang —
+tanpa itu pengamat dan penulis saling memanggil tanpa henti.
+
+### 7. Pengujian wajib MySQL
 
 `phpunit.xml` diarahkan ke `warta_test`, bukan sqlite — PHP di mesin
 pengembangan ini tidak punya driver sqlite.
@@ -92,6 +113,23 @@ yang sudah ada.
 
 Batas 4 foto (`TataLetakKolase::MAKS_FOTO`) dijaga di tiga tempat: pengunggah,
 komponen kanvas, dan perata susunan.
+
+## Model teks
+
+`ModelTeks` memilih huruf judul dan perlakuannya lewat atribut `data-model` di
+kanvas; aturannya sendiri ada di `resources/css/app.css`. Ditulis sebagai CSS
+biasa, bukan utility, karena `-webkit-text-stroke`, `paint-order`, dan gradien
+yang dipotong bentuk huruf memang tidak punya utility-nya.
+
+Dua kelas dipisah dengan sengaja: `.judul-kanvas` hanya membawa hurufnya,
+`.judul-hias` membawa garis tepi dan gradien. Hiasan hanya dipasang pada varian
+overlay — kalau digabung, aturan warnanya yang lebih spesifik akan mengalahkan
+kelas Tailwind pada varian pita dan judul putih mendarat di atas pita putih.
+
+Garis tepi tebal itu yang membuat Overlay boleh menjadi bawaan. Sebelum ada
+model teks, judul polos di atas kolase bisa jatuh tepat di atas wajah, jadi
+overlay diturunkan paksa ke pita begitu fotonya lebih dari satu. Penjagaan itu
+sudah dicabut.
 
 ## Satuan di dalam kanvas
 
@@ -124,3 +162,5 @@ php artisan warta:bersihkan-foto --paksa  # untuk cron
 - Fitur generate berita 5W+1H (`ANTHROPIC_API_KEY` sudah disiapkan di `.env`).
 - Autentikasi — saat ini semua rute terbuka.
 - Penyusunan ulang foto memakai tombol naik/turun, belum seret-lepas.
+- Judul overlay selalu rata kiri bawah; belum ada pilihan perataan atau pita
+  miring seperti poster desa pada umumnya.

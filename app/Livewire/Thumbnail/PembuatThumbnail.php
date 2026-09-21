@@ -4,6 +4,7 @@ namespace App\Livewire\Thumbnail;
 
 use App\Enums\Aksen;
 use App\Enums\GayaThumbnail;
+use App\Enums\ModelTeks;
 use App\Enums\UkuranThumbnail;
 use App\Models\Thumbnail;
 use App\Services\Thumbnail\PenyimpanFoto;
@@ -30,7 +31,9 @@ class PembuatThumbnail extends Component
 
     public ?string $tanggal = null;
 
-    public string $gaya = GayaThumbnail::PitaTerang->value;
+    public string $gaya = GayaThumbnail::Overlay->value;
+
+    public string $model = ModelTeks::Ceria->value;
 
     public string $aksen = Aksen::Biru->value;
 
@@ -72,6 +75,7 @@ class PembuatThumbnail extends Component
         $this->label = $thumbnail->label;
         $this->tanggal = $thumbnail->tanggal?->toDateString();
         $this->gaya = $thumbnail->gaya->value;
+        $this->model = $thumbnail->model_teks->value;
         $this->aksen = $thumbnail->aksen->value;
         $this->logoPath = $thumbnail->logo;
         $this->logoUrl = $thumbnail->logoUrl();
@@ -92,6 +96,7 @@ class PembuatThumbnail extends Component
             'label' => ['nullable', 'string', 'max:30'],
             'tanggal' => ['nullable', 'date'],
             'gaya' => ['required', 'string'],
+            'model' => ['required', 'string'],
             'aksen' => ['required', 'string'],
         ];
     }
@@ -224,6 +229,7 @@ class PembuatThumbnail extends Component
             'label' => $this->label,
             'tanggal' => $this->tanggal,
             'gaya' => $this->gaya,
+            'model_teks' => $this->model,
             'aksen' => $this->aksen,
             'logo' => $this->logoPath,
         ])->save();
@@ -253,11 +259,13 @@ class PembuatThumbnail extends Component
     #[Computed]
     public function gayaTerpilih(): GayaThumbnail
     {
-        $gaya = GayaThumbnail::tryFrom($this->gaya) ?? GayaThumbnail::PitaTerang;
+        return GayaThumbnail::tryFrom($this->gaya) ?? GayaThumbnail::Overlay;
+    }
 
-        return count($this->foto) > 1 && ! $gaya->cocokUntukKolase()
-            ? GayaThumbnail::PitaTerang
-            : $gaya;
+    #[Computed]
+    public function modelTerpilih(): ModelTeks
+    {
+        return ModelTeks::tryFrom($this->model) ?? ModelTeks::Ceria;
     }
 
     #[Computed]

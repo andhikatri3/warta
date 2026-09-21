@@ -11,21 +11,47 @@ import { domToBlob } from 'modern-screenshot'
  * Skala pratinjau
  * ------------------------------------------------------------------ */
 
-const pengamatUkuran = new ResizeObserver((entri) => {
-    for (const { target, contentRect } of entri) {
-        const kanvas = target.querySelector('[data-kanvas]')
-        if (!kanvas || !contentRect.width) continue
+function hitungSkala(wadah) {
+    const kanvas = wadah.querySelector('[data-kanvas]')
+    if (!kanvas) return
 
-        // Tingginya sendiri diurus aspect-ratio di CSS, jadi di sini cukup
-        // skalanya — satu sumber kebenaran, dan pratinjau sudah berukuran
-        // benar bahkan sebelum berkas ini sempat dijalankan.
-        target.style.setProperty('--skala', String(contentRect.width / Number(kanvas.dataset.lebar)))
-    }
+    const lebar = wadah.clientWidth
+    if (!lebar) return
+
+    // Tingginya sendiri diurus aspect-ratio di CSS, jadi di sini cukup
+    // skalanya — satu sumber kebenaran.
+    const skala = String(lebar / Number(kanvas.dataset.lebar))
+
+    // Menulis hanya kalau nilainya memang berbeda. Ini yang menghentikan
+    // pengamat DOM di bawah: menyetel style adalah perubahan atribut, yang
+    // membangunkan pengamat itu lagi — tanpa penjaga ini keduanya saling
+    // memanggil tanpa henti.
+    if (wadah.style.getPropertyValue('--skala') === skala) return
+
+    wadah.style.setProperty('--skala', skala)
+}
+
+const pengamatUkuran = new ResizeObserver((entri) => {
+    for (const { target } of entri) hitungSkala(target)
 })
 
+/*
+ * Skalanya dihitung langsung di sini, bukan diserahkan sepenuhnya ke
+ * ResizeObserver.
+ *
+ * Livewire memperbarui halaman dengan mencocokkan DOM ke HTML kiriman server,
+ * dan atribut style wadah ikut dikembalikan ke bentuk aslinya — --skala yang
+ * ditulis JavaScript terhapus setiap kali pemakai mengetik judul atau menambah
+ * foto. ResizeObserver tidak menyelamatkan keadaan itu: lebar wadahnya tidak
+ * berubah sedikit pun, jadi ia tidak pernah berbunyi, dan observe() pada
+ * elemen yang sudah diamati hanyalah no-op. Akibatnya kanvas kembali ke ukuran
+ * asli 1200 piksel di dalam wadah setengahnya dan tampak terpotong — padahal
+ * berkas yang diunduh tetap benar, karena penangkapan memakai ukuran aslinya.
+ */
 function pasangPratinjau() {
-    document.querySelectorAll('[data-pratinjau]').forEach((el) => {
-        pengamatUkuran.observe(el)
+    document.querySelectorAll('[data-pratinjau]').forEach((wadah) => {
+        hitungSkala(wadah)
+        pengamatUkuran.observe(wadah)
     })
 }
 
@@ -164,10 +190,18 @@ document.addEventListener('click', (peristiwa) => {
 pasangPratinjau()
 document.addEventListener('livewire:navigated', pasangPratinjau)
 
-// Livewire mengganti sebagian DOM saat memperbarui komponen; wadah pratinjau
-// yang baru muncul harus ikut diamati, kalau tidak skalanya tidak pernah
-// terhitung dan kanvas tampil sebesar ukuran aslinya.
+/*
+ * Atribut style ikut diawasi, bukan hanya susunan simpulnya.
+ *
+ * Pembaruan Livewire mengembalikan atribut style wadah ke bentuk kiriman
+ * server, dan itu menghapus --skala yang ditulis di sini. Perubahan itu murni
+ * perubahan atribut — tidak ada simpul yang ditambah atau dibuang — jadi
+ * pengawasan childList saja tidak pernah melihatnya, dan pratinjau tertinggal
+ * dalam keadaan terpotong sampai jendela kebetulan diubah ukurannya.
+ */
 new MutationObserver(pasangPratinjau).observe(document.body, {
     childList: true,
     subtree: true,
+    attributes: true,
+    attributeFilter: ['style'],
 })

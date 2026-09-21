@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Aksen;
 use App\Enums\GayaThumbnail;
+use App\Enums\ModelTeks;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,7 @@ class Thumbnail extends Model
         'label',
         'tanggal',
         'gaya',
+        'model_teks',
         'aksen',
         'logo',
     ];
@@ -27,6 +29,7 @@ class Thumbnail extends Model
         return [
             'tanggal' => 'date',
             'gaya' => GayaThumbnail::class,
+            'model_teks' => ModelTeks::class,
             'aksen' => Aksen::class,
         ];
     }

@@ -44,6 +44,7 @@
                             :label="$item->label"
                             :tanggal="$item->tanggal?->translatedFormat('j F Y')"
                             :gaya="$item->gaya"
+                            :model="$item->model_teks"
                             :aksen="$item->aksen"
                             :logo="$item->logoUrl()"
                             :foto="$item->foto->map(fn ($f) => [
