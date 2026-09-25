@@ -296,6 +296,18 @@ Ukur dengan foto berderau, jangan dengan gambar bergradasi mulus: gradasi
 terkompresi jauh lebih kecil daripada foto asli dan memberi angka yang
 menyenangkan tapi bohong.
 
+## Logo bawaan
+
+Tanpa logo unggahan, kanvas memakai logo desa dari `config('warta.logo_bawaan')`
+(`public/img/logo-bawaan.png`, PNG transparan 720x252). Keputusannya diambil di
+komponen kanvas, jadi pratinjau, riwayat, dan berkas unduhan semuanya ikut.
+Alamatnya wajib relatif (`/img/...`), jangan `asset()` — alasannya sama dengan
+URL disk `public` (gotcha #2), dan ada tes yang menjaganya. Kosongkan
+`WARTA_LOGO_BAWAAN=` di `.env` untuk thumbnail tanpa logo sama sekali.
+
+Logo desa bertulisan putih, jadi pratinjaunya di formulir sengaja berlatar
+gelap; di atas kotak terang tulisannya lenyap.
+
 ## Akun resmi di kanvas
 
 Baris akun di bawah subjudul datang dari `config/warta.php`, bukan dari

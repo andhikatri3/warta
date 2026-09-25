@@ -21,6 +21,11 @@
     $letak = TataLetakKolase::untuk($ukuran, count($foto));
     $sosmed = config('warta.sosmed', []);
 
+    // Tanpa logo unggahan, dipakai logo bawaan desa. Diputuskan di sini, di
+    // kanvas, bukan di komponen Livewire — jadi pratinjau, halaman riwayat,
+    // dan berkas unduhan semuanya ikut tanpa masing-masing harus ingat.
+    $logo = $logo ?: (config('warta.logo_bawaan') ?: null);
+
     // Bingkai kertas + bayangan tipis, hanya saat lebih dari satu foto. Foto
     // tunggal sudah memenuhi seluruh kanvas — menambah bingkai di situ hanya
     // menambah batas yang tidak perlu di sekeliling gambar yang memang harus

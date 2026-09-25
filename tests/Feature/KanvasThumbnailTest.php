@@ -141,8 +141,51 @@ class KanvasThumbnailTest extends TestCase
         $this->assertStringContainsString('rounded-[0.045em]', $tiga);
     }
 
+    public function test_tanpa_logo_unggahan_dipakai_logo_bawaan(): void
+    {
+        config(['warta.logo_bawaan' => '/img/logo-bawaan.png']);
+
+        $html = $this->render(UkuranThumbnail::Facebook, $this->foto(1));
+
+        $this->assertStringContainsString('src="/img/logo-bawaan.png"', $html);
+    }
+
+    public function test_logo_unggahan_menggantikan_logo_bawaan(): void
+    {
+        config(['warta.logo_bawaan' => '/img/logo-bawaan.png']);
+
+        $html = Blade::render(
+            '<x-kanvas-thumbnail :ukuran="$u" :foto="$f" logo="/storage/thumbnail/logo-sendiri.png" judul="Halo" />',
+            ['u' => UkuranThumbnail::Facebook, 'f' => $this->foto(1)],
+        );
+
+        $this->assertStringContainsString('/storage/thumbnail/logo-sendiri.png', $html);
+        $this->assertStringNotContainsString('logo-bawaan.png', $html);
+    }
+
+    public function test_logo_bawaan_harus_beralamat_relatif(): void
+    {
+        // Alamat absolut dari asal lain menajiskan kanvas dan tombol unduh
+        // gagal total — jadi nilai bawaannya wajib dimulai dari akar situs.
+        $this->assertStringStartsWith('/', (string) config('warta.logo_bawaan'));
+        $this->assertFileExists(public_path(ltrim((string) config('warta.logo_bawaan'), '/')));
+    }
+
+    public function test_logo_bawaan_bisa_dimatikan(): void
+    {
+        config(['warta.logo_bawaan' => '']);
+
+        $html = $this->render(UkuranThumbnail::Facebook, $this->foto(1));
+
+        $this->assertSame(1, substr_count($html, '<img'), 'Hanya foto yang dirender, tanpa logo');
+    }
+
     public function test_foto_melebihi_batas_tidak_ikut_dirender(): void
     {
+        // Logo bawaan juga sebuah <img>; dimatikan supaya yang dihitung
+        // benar-benar hanya foto kolase.
+        config(['warta.logo_bawaan' => '']);
+
         $html = $this->render(UkuranThumbnail::Facebook, $this->foto(7));
 
         $this->assertSame(

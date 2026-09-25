@@ -229,17 +229,28 @@
         <section class="rounded-xl border border-slate-200 bg-white p-4">
             <h2 class="mb-3 text-sm font-bold text-slate-900">Logo <span class="text-xs font-medium text-slate-400">— opsional</span></h2>
 
+            {{-- Pratinjau logo berlatar gelap: logo desa bertulisan putih dan
+                 memang dirancang untuk di atas foto yang digelapkan gradien —
+                 di atas kotak terang tulisannya hilang dan logo tampak rusak. --}}
+            @php $logoBawaan = config('warta.logo_bawaan'); @endphp
+
             @if ($logoUrl)
-                <div class="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-2">
-                    <img src="{{ $logoUrl }}" alt="" class="h-10 w-auto max-w-24 object-contain">
-                    <button type="button" wire:click="hapusLogo" class="ml-auto rounded-md px-2 py-1 text-xs font-semibold text-slate-500 transition hover:bg-red-100 hover:text-red-600">
-                        Hapus
+                <div class="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-800 p-2">
+                    <img src="{{ $logoUrl }}" alt="" class="h-10 w-auto max-w-40 object-contain">
+                    <button type="button" wire:click="hapusLogo" class="ml-auto rounded-md bg-white/10 px-2 py-1 text-xs font-semibold text-slate-200 transition hover:bg-red-500 hover:text-white">
+                        {{ $logoBawaan ? 'Pakai bawaan' : 'Hapus' }}
                     </button>
                 </div>
             @else
+                @if ($logoBawaan)
+                    <div class="mb-2 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-800 p-2">
+                        <img src="{{ $logoBawaan }}" alt="" class="h-10 w-auto max-w-40 object-contain">
+                        <span class="ml-auto text-[11px] font-semibold text-slate-300">Logo bawaan</span>
+                    </div>
+                @endif
                 <label class="flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 px-3 py-3 text-xs font-semibold text-slate-500 transition hover:border-slate-900 hover:text-slate-900">
                     <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/></svg>
-                    Unggah logo
+                    {{ $logoBawaan ? 'Ganti dengan logo lain' : 'Unggah logo' }}
                     <input type="file" wire:model="berkasLogo" accept="image/png,image/jpeg,image/webp" class="hidden">
                 </label>
             @endif
