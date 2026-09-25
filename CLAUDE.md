@@ -311,7 +311,8 @@ gelap; di atas kotak terang tulisannya lenyap.
 ## Akun resmi di kanvas
 
 Baris akun di bawah subjudul berasal dari `config/warta.php` (ganti lewat
-`.env`: `WARTA_FACEBOOK`, `WARTA_INSTAGRAM`, `WARTA_WEB`). Formulir terisi nilai
+`.env`: `WARTA_FACEBOOK`, `WARTA_INSTAGRAM`, `WARTA_TIKTOK`, `WARTA_YOUTUBE`,
+`WARTA_WEB`; TikTok dan YouTube bawaannya kosong, jadi tak tampil sampai diisi). Formulir terisi nilai
 itu, dan teksnya boleh diubah per thumbnail — kolom yang dikosongkan
 menyembunyikan akun itu tanpa menyisakan ikon yatim. Penyusunannya di
 `App\Support\AkunSosmed`:

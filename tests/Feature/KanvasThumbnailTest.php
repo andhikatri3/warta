@@ -84,6 +84,33 @@ class KanvasThumbnailTest extends TestCase
         $this->assertSame(3, substr_count($html, '<svg'), 'Tiap akun harus punya ikonnya sendiri');
     }
 
+    public function test_tiktok_dan_youtube_bawaannya_kosong_dan_tidak_tampil(): void
+    {
+        // Memakai konfigurasi sungguhan: kedua akun ada, tapi tanpa isi.
+        $this->assertSame('', \App\Support\AkunSosmed::bawaan()['tiktok'] ?? null);
+        $this->assertSame('', \App\Support\AkunSosmed::bawaan()['youtube'] ?? null);
+
+        $ikon = array_column(\App\Support\AkunSosmed::susun(null), 'ikon');
+        $this->assertNotContains('tiktok', $ikon);
+        $this->assertNotContains('youtube', $ikon);
+    }
+
+    public function test_tiktok_dan_youtube_tampil_setelah_diisi(): void
+    {
+        $html = Blade::render(
+            '<x-kanvas-thumbnail :ukuran="$u" :foto="$f" :sosmed="$s" judul="Halo" />',
+            [
+                'u' => UkuranThumbnail::Facebook,
+                'f' => $this->foto(1),
+                's' => \App\Support\AkunSosmed::susun(['tiktok' => '@penunggul.tt', 'youtube' => 'Desa Penunggul']),
+            ],
+        );
+
+        $this->assertStringContainsString('@penunggul.tt', $html);
+        $this->assertStringContainsString('Desa Penunggul', $html);
+        $this->assertSame(5, substr_count($html, '<svg'), 'Kelima akun harus punya ikonnya sendiri');
+    }
+
     public function test_akun_tanpa_isi_tidak_menyisakan_ikon_yatim(): void
     {
         config(['warta.sosmed' => []]);

@@ -72,7 +72,7 @@
                                 <input
                                     type="text"
                                     wire:model.live.debounce.400ms="sosmed.{{ $ikon }}"
-                                    placeholder="Kosongkan untuk menyembunyikan"
+                                    placeholder="{{ $bawaanSosmed[$ikon] === '' ? '@akun — kosongkan jika tidak dipakai' : 'Kosongkan untuk menyembunyikan' }}"
                                     class="{{ $kelasInput }} py-1.5"
                                 >
                             </label>

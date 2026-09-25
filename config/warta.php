@@ -12,12 +12,19 @@ return [
      *
      * Urutan larik menentukan urutan tampilnya. 'ikon' menunjuk ke komponen
      * Blade di resources/views/components/ikon.
+     *
+     * Akun berisi kosong TIDAK dibuang dari sini: ia tetap mendapat kolom di
+     * formulir (supaya bisa diisi per thumbnail), dan baru disaring saat
+     * kanvas disusun — lihat App\Support\AkunSosmed::susun(). TikTok dan
+     * YouTube sengaja kosong secara bawaan, jadi tidak tampil sampai diisi.
      */
-    'sosmed' => array_values(array_filter([
+    'sosmed' => [
         ['ikon' => 'facebook', 'akun' => env('WARTA_FACEBOOK', 'penunggul.id')],
         ['ikon' => 'instagram', 'akun' => env('WARTA_INSTAGRAM', '@penunggul.id')],
+        ['ikon' => 'tiktok', 'akun' => env('WARTA_TIKTOK', '')],
+        ['ikon' => 'youtube', 'akun' => env('WARTA_YOUTUBE', '')],
         ['ikon' => 'web', 'akun' => env('WARTA_WEB', 'penunggul.desa.id')],
-    ], fn (array $s) => trim((string) $s['akun']) !== '')),
+    ],
 
     /*
      * Logo yang dipakai kalau thumbnail tidak mengunggah logonya sendiri.
