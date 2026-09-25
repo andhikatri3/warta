@@ -51,6 +51,37 @@
                 @error('subjudul') <p class="{{ $kelasGalat }}">{{ $message }}</p> @enderror
             </div>
 
+            {{-- Akun resmi di bawah subjudul. Terisi bawaan dari
+                 config/warta.php; diubah hanya untuk thumbnail ini, dan kolom
+                 yang dikosongkan menyembunyikan akun itu dari kanvas. --}}
+            @if ($sosmed !== [])
+                @php $bawaanSosmed = \App\Support\AkunSosmed::bawaan(); @endphp
+                <div>
+                    <div class="mb-1.5 flex items-baseline gap-2">
+                        <span class="text-xs font-semibold text-slate-700">Akun sosmed</span>
+                        @if ($sosmed != $bawaanSosmed)
+                            <button type="button" wire:click="sosmedBawaan" class="ml-auto text-[11px] font-semibold text-slate-500 underline-offset-2 hover:text-slate-900 hover:underline">
+                                Kembalikan bawaan
+                            </button>
+                        @endif
+                    </div>
+                    <div class="space-y-1.5">
+                        @foreach ($sosmed as $ikon => $akun)
+                            <label class="flex items-center gap-2">
+                                <x-dynamic-component :component="'ikon.'.$ikon" class="size-4 shrink-0 text-slate-500" />
+                                <input
+                                    type="text"
+                                    wire:model.live.debounce.400ms="sosmed.{{ $ikon }}"
+                                    placeholder="Kosongkan untuk menyembunyikan"
+                                    class="{{ $kelasInput }} py-1.5"
+                                >
+                            </label>
+                            @error('sosmed.'.$ikon) <p class="{{ $kelasGalat }}">{{ $message }}</p> @enderror
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
         </section>
 
         {{-- ---------- Foto ---------- --}}
@@ -315,6 +346,7 @@
                             :aksen="$this->aksenTerpilih"
                             :logo="$logoUrl"
                             :foto="$foto"
+                            :sosmed="$this->akunTampil"
                         />
                     </div>
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Aksen;
 use App\Enums\ModelTeks;
+use App\Support\AkunSosmed;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,7 @@ class Thumbnail extends Model
         'model_teks',
         'aksen',
         'logo',
+        'sosmed',
     ];
 
     protected function casts(): array
@@ -25,6 +27,7 @@ class Thumbnail extends Model
         return [
             'model_teks' => ModelTeks::class,
             'aksen' => Aksen::class,
+            'sosmed' => 'array',
         ];
     }
 
@@ -53,6 +56,17 @@ class Thumbnail extends Model
     public function logoUrl(): ?string
     {
         return $this->logo ? Storage::disk('public')->url($this->logo) : null;
+    }
+
+    /**
+     * Baris akun resmi untuk kanvas: bawaan konfigurasi, ditimpa ubahan
+     * thumbnail ini kalau ada.
+     *
+     * @return array<int, array{ikon: string, akun: string}>
+     */
+    public function akunSosmed(): array
+    {
+        return AkunSosmed::susun($this->sosmed);
     }
 
     /**

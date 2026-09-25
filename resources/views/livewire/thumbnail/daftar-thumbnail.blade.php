@@ -44,6 +44,7 @@
                             :model="$item->model_teks"
                             :aksen="$item->aksen"
                             :logo="$item->logoUrl()"
+                            :sosmed="$item->akunSosmed()"
                             :foto="$item->foto->map(fn ($f) => [
                                 'url' => $f->url(),
                                 'fokus_x' => $f->fokus_x,

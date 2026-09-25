@@ -7,6 +7,7 @@ use App\Enums\ModelTeks;
 use App\Enums\UkuranThumbnail;
 use App\Models\Thumbnail;
 use App\Services\Thumbnail\PenyimpanFoto;
+use App\Support\AkunSosmed;
 use App\Support\TataLetakKolase;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
@@ -27,7 +28,20 @@ class PembuatThumbnail extends Component
 
     public string $model = ModelTeks::Ceria->value;
 
-    public string $aksen = Aksen::Biru->value;
+    /**
+     * Hijau, bukan biru: hampir semua thumbnail dibuat untuk situs desa
+     * Penunggul yang bernuansa hijau, dan bawaan biru terlalu sering lupa
+     * diganti sebelum diunduh.
+     */
+    public string $aksen = Aksen::Hijau->value;
+
+    /**
+     * Teks akun sosmed, ikon => teks. Diisi dari bawaan konfigurasi; yang
+     * dikosongkan tidak tampil di kanvas. Lihat App\Support\AkunSosmed.
+     *
+     * @var array<string, string>
+     */
+    public array $sosmed = [];
 
     /**
      * Foto yang sedang disusun, sudah berada di disk dan punya URL sesama asal.
@@ -55,6 +69,8 @@ class PembuatThumbnail extends Component
 
     public function mount(?Thumbnail $thumbnail = null): void
     {
+        $this->sosmed = AkunSosmed::bawaan();
+
         if (! $thumbnail?->exists) {
             // Datang dari halaman berita lewat tombol "Buat thumbnail": judulnya
             // dibawa di kueri supaya tidak perlu disalin tangan. Dipangkas ke
@@ -73,6 +89,13 @@ class PembuatThumbnail extends Component
         $this->logoPath = $thumbnail->logo;
         $this->logoUrl = $thumbnail->logoUrl();
 
+        // Akun yang dikosongkan tersimpan sebagai '' (tetap kosong di sini);
+        // yang tidak ada di ubahan — termasuk akun baru di konfigurasi —
+        // memakai bawaan, sama seperti AkunSosmed::susun().
+        foreach ($this->sosmed as $ikon => $akun) {
+            $this->sosmed[$ikon] = $thumbnail->sosmed[$ikon] ?? $akun;
+        }
+
         $this->foto = $thumbnail->foto->map(fn ($f) => [
             'path' => $f->path,
             'url' => $f->url(),
@@ -88,6 +111,8 @@ class PembuatThumbnail extends Component
             'subjudul' => ['nullable', 'string', 'max:200'],
             'model' => ['required', 'string'],
             'aksen' => ['required', 'string'],
+            'sosmed' => ['array'],
+            'sosmed.*' => ['nullable', 'string', 'max:60'],
         ];
     }
 
@@ -95,6 +120,7 @@ class PembuatThumbnail extends Component
     {
         return [
             'judul.max' => 'Judul terlalu panjang, maksimal 160 karakter.',
+            'sosmed.*.max' => 'Teks akun terlalu panjang, maksimal 60 karakter.',
             'unggahan.*.image' => 'Berkas :position bukan gambar.',
             'unggahan.*.mimes' => 'Gunakan JPG, PNG, atau WebP. Foto HEIC dari iPhone perlu dikonversi dulu.',
             'unggahan.*.max' => 'Ukuran berkas maksimal 12 MB.',
@@ -154,6 +180,11 @@ class PembuatThumbnail extends Component
         $this->logoPath = app(PenyimpanFoto::class)->simpanLogo($this->berkasLogo);
         $this->logoUrl = Storage::disk('public')->url($this->logoPath);
         $this->berkasLogo = null;
+    }
+
+    public function sosmedBawaan(): void
+    {
+        $this->sosmed = AkunSosmed::bawaan();
     }
 
     public function hapusLogo(): void
@@ -218,6 +249,7 @@ class PembuatThumbnail extends Component
             'model_teks' => $this->model,
             'aksen' => $this->aksen,
             'logo' => $this->logoPath,
+            'sosmed' => AkunSosmed::ubahan($this->sosmed),
         ])->save();
 
         $dipakai = collect($this->foto)->pluck('path');
@@ -251,7 +283,14 @@ class PembuatThumbnail extends Component
     #[Computed]
     public function aksenTerpilih(): Aksen
     {
-        return Aksen::tryFrom($this->aksen) ?? Aksen::Biru;
+        return Aksen::tryFrom($this->aksen) ?? Aksen::Hijau;
+    }
+
+    /** @return array<int, array{ikon: string, akun: string}> */
+    #[Computed]
+    public function akunTampil(): array
+    {
+        return AkunSosmed::susun($this->sosmed);
     }
 
     #[Computed]

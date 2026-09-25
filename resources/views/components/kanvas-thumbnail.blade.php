@@ -6,6 +6,7 @@
     'aksen' => null,
     'logo' => null,
     'foto' => [],
+    'sosmed' => null,
 ])
 
 @php
@@ -14,12 +15,13 @@
     use App\Support\TataLetakKolase;
 
     $model ??= ModelTeks::Ceria;
-    $aksen ??= Aksen::Biru;
+    $aksen ??= Aksen::Hijau;
 
     $foto = array_slice(array_values($foto), 0, TataLetakKolase::MAKS_FOTO);
 
     $letak = TataLetakKolase::untuk($ukuran, count($foto));
-    $sosmed = config('warta.sosmed', []);
+    // Tanpa ubahan dari pemanggil, dipakai akun bawaan di config/warta.php.
+    $sosmed ??= \App\Support\AkunSosmed::susun(null);
 
     // Tanpa logo unggahan, dipakai logo bawaan desa. Diputuskan di sini, di
     // kanvas, bukan di komponen Livewire — jadi pratinjau, halaman riwayat,

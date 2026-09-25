@@ -310,12 +310,21 @@ gelap; di atas kotak terang tulisannya lenyap.
 
 ## Akun resmi di kanvas
 
-Baris akun di bawah subjudul datang dari `config/warta.php`, bukan dari
-formulir maupun basis data: nilainya sama untuk semua thumbnail dan hampir tak
-pernah berubah, jadi mengetiknya ulang tiap kali hanya membuka peluang salah
-ketik yang baru ketahuan setelah gambarnya tersebar. Ganti lewat `.env`
-(`WARTA_FACEBOOK`, `WARTA_INSTAGRAM`, `WARTA_WEB`); akun yang dikosongkan
-hilang sendiri dari barisnya, tanpa menyisakan ikon yatim.
+Baris akun di bawah subjudul berasal dari `config/warta.php` (ganti lewat
+`.env`: `WARTA_FACEBOOK`, `WARTA_INSTAGRAM`, `WARTA_WEB`). Formulir terisi nilai
+itu, dan teksnya boleh diubah per thumbnail — kolom yang dikosongkan
+menyembunyikan akun itu tanpa menyisakan ikon yatim. Penyusunannya di
+`App\Support\AkunSosmed`:
+
+- Kolom `thumbnail.sosmed` (json) menyimpan peta `ikon => teks`, dan **null
+  kalau sama dengan bawaan** — thumbnail yang tak diubah tetap mengikuti
+  konfigurasi, jadi ganti nama akun desa ikut membetulkan riwayat lama.
+- Daftar ikon dan urutannya **selalu dari konfigurasi**, tidak pernah dari
+  masukan: nama ikon menjadi nama komponen di `<x-dynamic-component>`. Kunci
+  asing dari formulir diabaikan, dan ada tesnya.
+
+Aksen bawaan **hijau**, bukan biru: hampir semua thumbnail untuk situs desa
+Penunggul yang bernuansa hijau, dan bawaan biru sering lupa diganti.
 
 Ikonnya komponen Blade di `resources/views/components/ikon/`, dipanggil lewat
 `<x-dynamic-component>` dari nilai `ikon` pada konfigurasi. SVG sebaris, bukan
