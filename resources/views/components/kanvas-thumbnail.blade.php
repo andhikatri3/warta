@@ -98,16 +98,18 @@
                  supaya terbaca di atas foto apa pun. Margin kiri menggesernya
                  dari tepi padding kolom teks — supaya tidak mepet rata dengan
                  judul dan subjudul di atasnya, tampak lebih ke tengah.
-                 Nilainya sengaja cukup besar (bukan sekadar nudge halus):
-                 di kanvas penuh 1200px, 0.25em cuma ±15px, tapi begitu
-                 gambar ini ditampilkan mengecil di situs (mis. lebar 400px
-                 di penunggul.desa.id), itu tinggal ±5px — terlalu tipis kalau
-                 kontainer di situs sedikit saja menutup/memotong tepi
-                 gambar. Marginnya dalam em, jadi tetap sebanding di ukuran
-                 kanvas mana pun (Facebook/Persegi/Story), bukan cuma pas
-                 di satu ukuran. --}}
+
+                 Nilai ini sempat dinaikkan ke 0.6em karena akun dan logo
+                 terpotong di kartu berita penunggul.desa.id. Penyebab
+                 sebenarnya ada di situs, bukan di sini: kotak gambar kartunya
+                 bertinggi tetap dengan object-cover, jadi rasionya berubah per
+                 layar dan tepi gambar ikut terpotong. Sudah diperbaiki di tema
+                 situs (rasio kotak dikunci 1200:630), jadi margin di sini
+                 kembali ke nilai semula. Kalau tepi gambar terpotong lagi di
+                 suatu tempat, periksa dulu cara tempat itu menampilkan gambar
+                 — menambah margin di sini hanya menambal gejalanya. --}}
             @if ($sosmed !== [])
-                <div class="mt-[0.32em] ml-[0.6em] flex flex-wrap items-center gap-x-[0.45em] gap-y-[0.12em]">
+                <div class="mt-[0.32em] ml-[0.25em] flex flex-wrap items-center gap-x-[0.45em] gap-y-[0.12em]">
                     @foreach ($sosmed as $s)
                         <span class="flex items-center gap-[0.34em] text-[0.23em] font-bold leading-none text-white [text-shadow:0_0.07em_0.09em_rgb(0_0_0/0.85)]">
                             <x-dynamic-component
@@ -125,11 +127,9 @@
         {{-- Margin kanan menggesernya dari tepi padding baris — logonya
              tidak mepet rata di sudut kanvas, sepasang dengan margin kiri
              pada baris akun di sisi satunya. Lihat catatan di baris akun
-             soal kenapa nilainya sebesar ini: gambar ini nanti ditampilkan
-             mengecil di situs, dan margin yang tipis di kanvas penuh
-             menjadi nyaris tak ada begitu ukurannya diperkecil. --}}
+             soal kenapa nilainya pernah dinaikkan lalu dikembalikan. --}}
         @if ($logo)
-            <img src="{{ $logo }}" alt="" class="mr-[0.6em] h-[0.95em] w-auto shrink-0 object-contain [filter:drop-shadow(0_0.04em_0.06em_rgb(0_0_0/0.5))]">
+            <img src="{{ $logo }}" alt="" class="mr-[0.25em] h-[0.95em] w-auto shrink-0 object-contain [filter:drop-shadow(0_0.04em_0.06em_rgb(0_0_0/0.5))]">
         @endif
     </div>
 </div>
